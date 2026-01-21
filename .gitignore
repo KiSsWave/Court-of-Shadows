@@ -1,0 +1,9 @@
+users.json
+node_modules
+npm-debug.log
+.git
+.gitignore
+.idea
+*.md
+.env
+.DS_Store

@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Court of Shadows - Règles du Jeu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cinzel', Georgia, serif;
+            background: #1a0a2e;
+            color: #f5f0e8;
+            line-height: 1.8;
+            padding: 40px;
+        }
+
+        .rules-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, rgba(26, 10, 46, 0.95) 0%, rgba(28, 28, 40, 0.95) 50%, rgba(15, 27, 61, 0.95) 100%);
+            border-radius: 20px;
+            padding: 50px;
+            border: 3px solid rgba(212, 175, 55, 0.5);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 3rem;
+            background: linear-gradient(135deg, #ffd700 0%, #d4af37 50%, #cd7f32 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            letter-spacing: 4px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #e9c46a;
+            font-style: italic;
+            margin-bottom: 40px;
+            font-size: 1.2rem;
+        }
+
+        h2 {
+            color: #d4af37;
+            font-size: 1.6rem;
+            margin: 35px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+            letter-spacing: 2px;
+        }
+
+        h3 {
+            color: #e9c46a;
+            font-size: 1.2rem;
+            margin: 25px 0 15px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin: 15px 0 15px 30px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        .highlight {
+            background: rgba(212, 175, 55, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #d4af37;
+            margin: 20px 0;
+        }
+
+        .faction {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 8px;
+            font-weight: 700;
+            margin: 2px;
+        }
+
+        .loyalists {
+            background: linear-gradient(135deg, #1e4d8b 0%, #2d5a9a 100%);
+            border: 2px solid #4a7bbf;
+        }
+
+        .conspirators {
+            background: linear-gradient(135deg, #8b0000 0%, #a00000 100%);
+            border: 2px solid #c44;
+        }
+
+        .card {
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-weight: 700;
+            margin: 3px;
+        }
+
+        .card-edit {
+            background: linear-gradient(135deg, #1e4d8b 0%, #0f274f 100%);
+            border: 2px solid #4a9eff;
+        }
+
+        .card-plot {
+            background: linear-gradient(135deg, #8b0000 0%, #4a0000 100%);
+            border: 2px solid #ff0000;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        th {
+            background: rgba(212, 175, 55, 0.2);
+            color: #d4af37;
+            font-weight: 700;
+        }
+
+        tr:nth-child(even) {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .power-table th:first-child,
+        .power-table td:first-child {
+            text-align: left;
+        }
+
+        .emoji {
+            font-size: 1.3em;
+        }
+
+        .print-btn {
+            display: block;
+            margin: 30px auto;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #ffd700 0%, #d4af37 50%, #cd7f32 100%);
+            color: #0a0612;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .print-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.5);
+        }
+
+        @media print {
+            body {
+                background: white;
+                color: black;
+                padding: 20px;
+            }
+
+            .rules-container {
+                background: white;
+                border: 2px solid #333;
+                box-shadow: none;
+                padding: 30px;
+            }
+
+            h1 {
+                background: none;
+                -webkit-text-fill-color: #8b4513;
+                color: #8b4513;
+            }
+
+            h2 {
+                color: #8b4513;
+                border-bottom-color: #8b4513;
+            }
+
+            h3 {
+                color: #654321;
+            }
+
+            .subtitle {
+                color: #654321;
+            }
+
+            .highlight {
+                background: #f5f5f5;
+                border-left-color: #8b4513;
+            }
+
+            .faction, .card {
+                border-width: 1px;
+            }
+
+            .loyalists {
+                background: #e6f2ff;
+                color: #1e4d8b;
+                border-color: #1e4d8b;
+            }
+
+            .conspirators {
+                background: #ffe6e6;
+                color: #8b0000;
+                border-color: #8b0000;
+            }
+
+            .card-edit {
+                background: #e6f2ff;
+                color: #1e4d8b;
+                border-color: #1e4d8b;
+            }
+
+            .card-plot {
+                background: #ffe6e6;
+                color: #8b0000;
+                border-color: #8b0000;
+            }
+
+            th {
+                background: #f0f0f0;
+                color: #333;
+            }
+
+            .print-btn {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="rules-container">
+        <h1>COURT OF SHADOWS</h1>
+        <p class="subtitle">Un jeu d'intrigue et de trahison pour 5 à 10 joueurs</p>
+
+        <button class="print-btn" onclick="window.print()">Imprimer / Sauvegarder en PDF</button>
+
+        <h2><span class="emoji">📖</span> Introduction</h2>
+        <p>
+            Dans <strong>Court of Shadows</strong>, vous incarnez des membres de la cour royale dans une époque de complots et de trahisons.
+            Le royaume est divisé entre les <span class="faction loyalists">Loyalistes</span> qui cherchent à maintenir l'ordre,
+            et les <span class="faction conspirators">Conspirateurs</span> qui veulent renverser le pouvoir en place.
+        </p>
+        <p>
+            Parmi les Conspirateurs se cache l'<strong>Usurpateur</strong>, le chef secret qui convoite le trône.
+            Les Loyalistes doivent le démasquer avant qu'il ne soit trop tard !
+        </p>
+
+        <h2><span class="emoji">👥</span> Les Rôles</h2>
+
+        <h3><span class="emoji">⚜️</span> Loyalistes</h3>
+        <p>
+            Les Loyalistes forment la majorité de la cour. Ils ne connaissent l'identité de personne et doivent découvrir qui sont les traîtres
+            en observant les votes et les actions des autres joueurs.
+        </p>
+
+        <h3><span class="emoji">🗡️</span> Conspirateurs</h3>
+        <p>
+            Les Conspirateurs se connaissent entre eux. Ils doivent saboter les efforts des Loyalistes tout en restant discrets
+            pour ne pas être découverts.
+        </p>
+
+        <h3><span class="emoji">👑💀</span> Usurpateur</h3>
+        <p>
+            L'Usurpateur est le chef des Conspirateurs. Il ne connaît l'identité de personne (sauf si l'option est activée).
+            Son objectif ultime est de devenir Chancelier après que 3 Complots aient été adoptés.
+        </p>
+
+        <div class="highlight">
+            <strong>Option de jeu :</strong> "Les Conspirateurs connaissent l'Usurpateur" - Si activée, les Conspirateurs
+            peuvent voir qui est l'Usurpateur, ce qui facilite leur coordination.
+        </div>
+
+        <h2><span class="emoji">📊</span> Distribution des Rôles</h2>
+        <table>
+            <tr>
+                <th>Joueurs</th>
+                <th><span class="emoji">⚜️</span> Loyalistes</th>
+                <th><span class="emoji">🗡️</span> Conspirateurs</th>
+                <th><span class="emoji">👑💀</span> Usurpateur</th>
+            </tr>
+            <tr><td>5</td><td>3</td><td>1</td><td>1</td></tr>
+            <tr><td>6</td><td>4</td><td>1</td><td>1</td></tr>
+            <tr><td>7</td><td>4</td><td>2</td><td>1</td></tr>
+            <tr><td>8</td><td>5</td><td>2</td><td>1</td></tr>
+            <tr><td>9</td><td>5</td><td>3</td><td>1</td></tr>
+            <tr><td>10</td><td>6</td><td>3</td><td>1</td></tr>
+        </table>
+
+        <h2><span class="emoji">🎴</span> Les Décrets</h2>
+        <p>Le jeu utilise un paquet de <strong>17 décrets</strong> :</p>
+        <ul>
+            <li><span class="card card-plot">🗡️ 11 Complots</span> - Favorisent les Conspirateurs</li>
+            <li><span class="card card-edit">⚜️ 6 Édits Royaux</span> - Favorisent les Loyalistes</li>
+        </ul>
+
+        <h2><span class="emoji">🏆</span> Conditions de Victoire</h2>
+
+        <h3><span class="faction loyalists">Victoire des Loyalistes</span></h3>
+        <ul>
+            <li><strong>5 Édits Royaux adoptés</strong> - La stabilité est restaurée !</li>
+            <li><strong>L'Usurpateur est exécuté</strong> - Le traître a été démasqué !</li>
+        </ul>
+
+        <h3><span class="faction conspirators">Victoire des Conspirateurs</span></h3>
+        <ul>
+            <li><strong>6 Complots adoptés</strong> - Le chaos règne !</li>
+            <li><strong>L'Usurpateur devient Chancelier</strong> (après 3 Complots) - L'Usurpateur prend le pouvoir !</li>
+        </ul>
+
+        <h2><span class="emoji">🎮</span> Déroulement d'un Tour</h2>
+
+        <h3>1. <span class="emoji">👑</span> Nomination du Chancelier</h3>
+        <p>
+            Le <strong>Roi</strong> (président du tour) nomme un autre joueur pour devenir <strong>Chancelier</strong>.
+        </p>
+        <div class="highlight">
+            <strong>Restriction :</strong> Le Chancelier du tour précédent ne peut pas être renommé immédiatement.
+        </div>
+
+        <h3>2. <span class="emoji">🗳️</span> Vote du Conseil</h3>
+        <p>
+            Tous les joueurs vivants votent <strong>OUI</strong> ou <strong>NON</strong> pour approuver le gouvernement proposé.
+        </p>
+        <ul>
+            <li><strong>Majorité de OUI :</strong> Le gouvernement est élu, on passe à la session législative.</li>
+            <li><strong>Majorité de NON :</strong> Le gouvernement est rejeté, le compteur d'impasse augmente.</li>
+        </ul>
+        <div class="highlight">
+            <strong>Impasse :</strong> Après 3 rejets consécutifs, la première carte de la pioche est automatiquement adoptée !
+        </div>
+
+        <h3>3. <span class="emoji">📜</span> Session Législative</h3>
+        <ol>
+            <li>Le <strong>Roi</strong> pioche 3 décrets et en défausse 1 secrètement.</li>
+            <li>Il passe les 2 décrets restants au <strong>Chancelier</strong>.</li>
+            <li>Le <strong>Chancelier</strong> défausse 1 décret et adopte l'autre.</li>
+        </ol>
+        <p>
+            <em>Aucune communication n'est autorisée pendant la session. Après, les joueurs peuvent discuter
+            (et potentiellement mentir) sur les cartes qu'ils avaient.</em>
+        </p>
+
+        <h3>4. <span class="emoji">⚡</span> Pouvoir Exécutif (si applicable)</h3>
+        <p>
+            Quand un <span class="card card-plot">Complot</span> est adopté, le Roi peut obtenir un pouvoir spécial
+            selon le nombre de Complots adoptés et le nombre de joueurs.
+        </p>
+
+        <h2><span class="emoji">⚡</span> Pouvoirs Exécutifs</h2>
+
+        <h3>Plateau 5-6 joueurs</h3>
+        <table class="power-table">
+            <tr>
+                <th>Complots</th>
+                <th>1</th>
+                <th>2</th>
+                <th>3</th>
+                <th>4</th>
+                <th>5</th>
+            </tr>
+            <tr>
+                <td><strong>Pouvoir</strong></td>
+                <td>-</td>
+                <td>-</td>
+                <td><span class="emoji">👁️</span> Inspection</td>
+                <td><span class="emoji">💀</span> Exécution</td>
+                <td><span class="emoji">💀</span> Exécution + <span class="emoji">🚫</span> Véto</td>
+            </tr>
+        </table>
+
+        <h3>Plateau 7-8 joueurs</h3>
+        <table class="power-table">
+            <tr>
+                <th>Complots</th>
+                <th>1</th>
+                <th>2</th>
+                <th>3</th>
+                <th>4</th>
+                <th>5</th>
+            </tr>
+            <tr>
+                <td><strong>Pouvoir</strong></td>
+                <td>-</td>
+                <td><span class="emoji">🔍</span> Enquête</td>
+                <td><span class="emoji">👑</span> Succession</td>
+                <td><span class="emoji">💀</span> Exécution</td>
+                <td><span class="emoji">💀</span> Exécution + <span class="emoji">🚫</span> Véto</td>
+            </tr>
+        </table>
+
+        <h3>Plateau 9-10 joueurs</h3>
+        <table class="power-table">
+            <tr>
+                <th>Complots</th>
+                <th>1</th>
+                <th>2</th>
+                <th>3</th>
+                <th>4</th>
+                <th>5</th>
+            </tr>
+            <tr>
+                <td><strong>Pouvoir</strong></td>
+                <td><span class="emoji">🔍</span> Enquête</td>
+                <td><span class="emoji">🔍</span> Enquête</td>
+                <td><span class="emoji">👑</span> Succession</td>
+                <td><span class="emoji">💀</span> Exécution</td>
+                <td><span class="emoji">💀</span> Exécution + <span class="emoji">🚫</span> Véto</td>
+            </tr>
+        </table>
+
+        <p style="margin-top: 15px; font-style: italic; color: #aaa;">
+            <span class="emoji">🚫</span> <strong>Véto :</strong> À partir de 5 Complots, le Chancelier peut proposer un véto (voir section ci-dessous).
+        </p>
+
+        <h3>Description des Pouvoirs</h3>
+        <ul>
+            <li><strong><span class="emoji">👁️</span> Inspection de la Pioche :</strong> Le Roi regarde secrètement les 3 prochaines cartes de la pioche.</li>
+            <li><strong><span class="emoji">🔍</span> Enquête :</strong> Le Roi choisit un joueur et découvre secrètement sa faction (Loyaliste ou Conspirateur).</li>
+            <li><strong><span class="emoji">👑</span> Succession Spéciale :</strong> Le Roi choisit qui sera le prochain Roi.</li>
+            <li><strong><span class="emoji">💀</span> Exécution :</strong> Le Roi élimine un joueur de la partie. Si c'est l'Usurpateur, les Loyalistes gagnent immédiatement !</li>
+        </ul>
+
+        <h2><span class="emoji">🚫</span> Le Véto</h2>
+        <p>
+            Le <strong>Véto</strong> est un pouvoir spécial qui se débloque lorsque <strong>5 Complots</strong> ont été adoptés.
+            Il permet d'éviter les situations de malchance en fin de partie.
+        </p>
+
+        <div class="highlight">
+            <strong>Comment fonctionne le Véto :</strong>
+            <ol style="margin-top: 15px;">
+                <li>Lorsque le <strong>Chancelier</strong> reçoit ses 2 cartes, il peut choisir de <strong>proposer un Véto</strong> au lieu de défausser une carte.</li>
+                <li>Le <strong>Roi</strong> doit alors décider d'<strong>accepter</strong> ou de <strong>refuser</strong> le Véto.</li>
+                <li><strong>Si le Roi accepte :</strong> Les 2 cartes sont défaussées, aucune loi n'est adoptée, et le compteur d'impasse augmente de 1.</li>
+                <li><strong>Si le Roi refuse :</strong> Le Chancelier doit obligatoirement choisir une des 2 cartes à défausser (comme d'habitude).</li>
+            </ol>
+        </div>
+
+        <p>
+            <strong>Attention :</strong> Le Véto compte comme un tour sans loi adoptée. Après 3 tours consécutifs sans loi
+            (votes rejetés ou vétos acceptés), la première carte de la pioche est automatiquement adoptée !
+        </p>
+
+        <h2><span class="emoji">💡</span> Conseils Stratégiques</h2>
+
+        <h3>Pour les Loyalistes</h3>
+        <ul>
+            <li>Observez attentivement les votes et les accusations.</li>
+            <li>Méfiez-vous des joueurs qui votent OUI pour des gouvernements suspects.</li>
+            <li>N'ayez pas peur d'utiliser l'Exécution si vous avez des soupçons fondés.</li>
+            <li>Après 3 Complots, faites très attention à qui devient Chancelier !</li>
+        </ul>
+
+        <h3>Pour les Conspirateurs</h3>
+        <ul>
+            <li>Ne soyez pas trop évidents dans vos sabotages.</li>
+            <li>Accusez parfois vos alliés pour paraître crédibles.</li>
+            <li>Votez parfois avec les Loyalistes pour ne pas être repérés.</li>
+            <li>Protégez l'Usurpateur sans être trop suspects.</li>
+        </ul>
+
+        <h3>Pour l'Usurpateur</h3>
+        <ul>
+            <li>Jouez comme un Loyaliste au début pour gagner la confiance.</li>
+            <li>Évitez de devenir Chancelier trop tôt (avant 3 Complots).</li>
+            <li>Une fois 3 Complots adoptés, faites-vous élire Chancelier pour gagner !</li>
+        </ul>
+
+        <div class="highlight" style="text-align: center; margin-top: 40px;">
+            <p style="font-size: 1.3rem; margin: 0;">
+                <strong>Bonne partie et que les intrigues commencent !</strong>
+            </p>
+            <p style="margin: 10px 0 0; color: #888;">
+                <span class="emoji">👑</span> Court of Shadows <span class="emoji">🗡️</span>
+            </p>
+        </div>
+
+        <button class="print-btn" onclick="window.print()">Imprimer / Sauvegarder en PDF</button>
+    </div>
+</body>
+</html>

@@ -1,0 +1,25 @@
+{
+  "name": "court-of-shadows",
+  "version": "1.0.0",
+  "description": "Jeu de déduction sociale inspiré de Secret Hitler",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "nodemon server/server.js"
+  },
+  "keywords": [
+    "websocket",
+    "game",
+    "social-deduction",
+    "multiplayer"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

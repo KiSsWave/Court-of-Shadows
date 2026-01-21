@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Court of Shadows</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- Écran d'authentification -->
+<div id="auth-screen" class="screen active">
+    <div class="container">
+        <div class="logo-container">
+            <img src="images/logo.png" alt="Court of Shadows">
+        </div>
+        <h1 class="title">Court of Shadows</h1>
+        <p class="subtitle">Un jeu de déduction sociale et d'intrigues</p>
+
+        <div class="form-card">
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login">Connexion</button>
+                <button class="auth-tab" data-tab="register">Inscription</button>
+            </div>
+
+            <div id="login-form" class="auth-form active">
+                <input type="text" id="login-username" placeholder="Nom d'utilisateur" maxlength="20">
+                <input type="password" id="login-password" placeholder="Mot de passe" maxlength="50">
+                <button id="login-btn" class="btn btn-primary">Se connecter</button>
+            </div>
+
+            <div id="register-form" class="auth-form">
+                <input type="text" id="register-username" placeholder="Nom d'utilisateur" maxlength="20">
+                <input type="password" id="register-password" placeholder="Mot de passe" maxlength="50">
+                <input type="password" id="register-password-confirm" placeholder="Confirmer le mot de passe" maxlength="50">
+                <button id="register-btn" class="btn btn-primary">S'inscrire</button>
+            </div>
+
+            <div id="auth-error" class="auth-error"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Écran de lobby -->
+<div id="lobby-screen" class="screen">
+    <div class="container">
+        <div class="logo-container">
+            <img src="images/logo.png" alt="Court of Shadows">
+        </div>
+        <h1 class="title">Court of Shadows</h1>
+
+        <div class="user-info">
+            <span>Bienvenue, </span>
+            <strong id="logged-username">-</strong>
+            <button id="logout-btn" class="btn-icon" title="Déconnexion">Quitter</button>
+        </div>
+
+        <!-- Section: Créer une partie -->
+        <div class="form-card">
+            <h2 style="text-align: center; margin-bottom: 20px;"> Créer une Partie</h2>
+
+            <div class="create-game-options">
+                <div class="game-type-selector">
+                    <button class="game-type-btn active" data-type="public">
+                         Partie Publique
+                    </button>
+                    <button class="game-type-btn" data-type="private">
+                         Partie Privée
+                    </button>
+                </div>
+
+                <div id="private-password-field" style="display: none; margin: 15px 0;">
+                    <input type="password" id="game-password" placeholder="Mot de passe de la partie" maxlength="20">
+                </div>
+
+                <button id="create-game-btn" class="btn btn-primary" style="width: 100%;">
+                    Créer la Partie
+                </button>
+            </div>
+        </div>
+
+        <!-- Section: Rejoindre avec code -->
+        <div class="form-card" style="margin-top: 20px;">
+            <h2 style="text-align: center; margin-bottom: 20px;">🔑 Rejoindre avec Code</h2>
+
+            <div class="join-game-form">
+                <div class="input-group">
+                    <label for="room-code" class="input-label">Code de la partie</label>
+                    <input type="text" id="room-code" placeholder="Ex: ABC123" maxlength="10" class="input-with-icon">
+                </div>
+
+                <div class="input-group">
+                    <label for="join-password" class="input-label">Mot de passe (optionnel)</label>
+                    <input type="password" id="join-password" placeholder="Si partie privée..." maxlength="20">
+                </div>
+
+                <button id="join-game-btn" class="btn btn-primary" style="width: 100%; margin-bottom: 0;">
+                    🚪 Rejoindre la Partie
+                </button>
+            </div>
+        </div>
+
+        <!-- Section: Parties publiques -->
+        <div class="form-card" style="margin-top: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 style="margin: 0;"> Parties Publiques</h2>
+                <button id="refresh-public-games" class="btn-icon" title="Actualiser">🔄</button>
+            </div>
+
+            <div id="public-games-list" class="games-list">
+                <p style="text-align: center; color: #888;">Chargement...</p>
+            </div>
+        </div>
+
+        <!-- Section: Mes parties en cours -->
+        <div class="form-card" style="margin-top: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 style="margin: 0;"> Mes Parties en Cours</h2>
+                <button id="refresh-my-games" class="btn-icon" title="Actualiser">🔄</button>
+            </div>
+
+            <div id="my-games-list" class="games-list">
+                <p style="text-align: center; color: #888;">Aucune partie en cours</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Salle d'attente -->
+<div id="waiting-room" class="screen">
+    <div class="container">
+        <h1 class="title"> Salle d'attente</h1>
+
+        <div class="room-info">
+            <p>Code de la partie : <strong id="display-room-code"></strong></p>
+            <button id="copy-code-btn" class="btn-icon">📋</button>
+        </div>
+
+        <div class="players-list">
+            <h2>Joueurs connectés (<span id="player-count">0</span>)</h2>
+            <div id="players-container"></div>
+        </div>
+
+        <div id="game-settings" class="game-settings" style="display: none;">
+            <h3>Paramètres de la partie</h3>
+            <div class="setting-item">
+                <label class="toggle-label">
+                    <input type="checkbox" id="setting-conspirators-know-usurper">
+                    <span class="toggle-switch"></span>
+                    <span class="setting-text">Les Conspirateurs connaissent l'Usurpateur</span>
+                </label>
+                <p class="setting-hint">Si activé, les conspirateurs verront qui est l'usurpateur</p>
+            </div>
+            <div class="setting-item">
+                <label class="toggle-label">
+                    <input type="checkbox" id="setting-usurper-knows-allies">
+                    <span class="toggle-switch"></span>
+                    <span class="setting-text">L'Usurpateur connaît ses alliés</span>
+                </label>
+                <p class="setting-hint">Si activé, l'usurpateur verra qui sont les conspirateurs</p>
+            </div>
+        </div>
+
+        <div class="waiting-actions">
+            <button id="start-game-btn" class="btn btn-primary" style="display: none;">Démarrer la partie</button>
+            <button id="leave-game-btn" class="btn btn-danger">Quitter</button>
+        </div>
+    </div>
+</div>
+
+<!-- Révélation des rôles -->
+<div id="role-reveal" class="screen">
+    <div class="container role-container">
+        <div class="role-card">
+            <div id="role-icon" class="role-icon"></div>
+            <h1 id="role-title"></h1>
+            <p id="role-description"></p>
+            <div id="conspiracy-info" style="display: none;">
+                <h3>Vos alliés conspirateurs :</h3>
+                <ul id="conspirators-list"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Jeu principal -->
+<div id="game-screen" class="screen">
+    <div class="game-container">
+        <div class="game-header">
+            <div class="score-board">
+                <div class="deck-info">
+                    <div class="deck-item draw-pile">
+                        <img src="images/logo.png" alt="Pioche" class="deck-card-img">
+                        <span class="deck-count" id="deck-count">17</span>
+                        <span class="deck-label">Pioche</span>
+                    </div>
+                    <div class="deck-item discard-pile">
+                        <div class="discard-placeholder"></div>
+                        <span class="deck-count" id="discard-count">0</span>
+                        <span class="deck-label">Défausse</span>
+                    </div>
+                </div>
+                <div class="scores-container">
+                    <div class="score-item loyalists">
+                        <span class="label">Édits Royaux</span>
+                        <span class="count" id="edits-count">0</span>/5
+                    </div>
+                    <div class="score-item conspirators">
+                        <span class="label">Complots</span>
+                        <span class="count" id="plots-count">0</span>/6
+                    </div>
+                </div>
+            </div>
+
+            <div class="phase-indicator">
+                <span id="current-phase"></span>
+            </div>
+
+            <div class="header-right">
+                <div class="player-info-display">
+                    <span class="player-name-label" id="game-player-name">-</span>
+                </div>
+                <div class="player-role-display" id="player-role-display">
+                    <span class="role-label">Rôle :</span>
+                    <span class="role-value" id="your-role-value">-</span>
+                </div>
+                <div class="deadlock-counter">
+                    <span>Impasse : </span>
+                    <span id="deadlock-count">0</span>/3
+                </div>
+                <button id="host-pause-btn" class="btn btn-small btn-secondary" style="display: none;">⏸️ Pause</button>
+            </div>
+        </div>
+
+        <div class="progression-boards-container">
+            <div class="progression-board conspirators">
+                <div class="board-overlay"></div>
+                <div class="progress-markers" id="plots-markers">
+                    <div class="progress-marker conspirators-marker" data-index="0">
+                        <img src="images/complot.png" alt="Complot" class="marker-card">
+                        <span class="power-icon"></span>
+                    </div>
+                    <div class="progress-marker conspirators-marker" data-index="1">
+                        <img src="images/complot.png" alt="Complot" class="marker-card">
+                        <span class="power-icon"></span>
+                    </div>
+                    <div class="progress-marker conspirators-marker" data-index="2">
+                        <img src="images/complot.png" alt="Complot" class="marker-card">
+                        <span class="power-icon"></span>
+                    </div>
+                    <div class="progress-marker conspirators-marker" data-index="3">
+                        <img src="images/complot.png" alt="Complot" class="marker-card">
+                        <span class="power-icon"></span>
+                    </div>
+                    <div class="progress-marker conspirators-marker" data-index="4">
+                        <img src="images/complot.png" alt="Complot" class="marker-card">
+                        <span class="power-icon"></span>
+                    </div>
+                    <div class="progress-marker conspirators-marker" data-index="5">
+                        <img src="images/complot.png" alt="Complot" class="marker-card">
+                        <span class="power-icon">VICTOIRE</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="progression-board loyalists">
+                <div class="board-overlay"></div>
+                <div class="progress-markers edits">
+                    <div class="progress-marker loyalists-marker" data-index="0">
+                        <img src="images/edit-royal.png" alt="Édit Royal" class="marker-card">
+                    </div>
+                    <div class="progress-marker loyalists-marker" data-index="1">
+                        <img src="images/edit-royal.png" alt="Édit Royal" class="marker-card">
+                    </div>
+                    <div class="progress-marker loyalists-marker" data-index="2">
+                        <img src="images/edit-royal.png" alt="Édit Royal" class="marker-card">
+                    </div>
+                    <div class="progress-marker loyalists-marker" data-index="3">
+                        <img src="images/edit-royal.png" alt="Édit Royal" class="marker-card">
+                    </div>
+                    <div class="progress-marker loyalists-marker" data-index="4">
+                        <img src="images/edit-royal.png" alt="Édit Royal" class="marker-card">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-main">
+            <div class="game-players">
+                <h3>Joueurs</h3>
+                <div id="game-players-list"></div>
+            </div>
+
+            <div class="game-action">
+                <div id="action-container"></div>
+            </div>
+
+            <div class="game-chat">
+                <h3>💬 Discussion</h3>
+                <div id="chat-messages"></div>
+                <div id="share-cards-container"></div>
+                <div class="chat-input">
+                    <input type="text" id="chat-input" placeholder="Votre message...">
+                    <button id="send-chat-btn">Envoyer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Écran de fin -->
+<div id="game-over-screen" class="screen">
+    <div class="container">
+        <div class="game-over-card">
+            <h1 id="winner-title"></h1>
+            <p id="winner-reason"></p>
+            <div id="final-roles-container" class="final-roles-container"></div>
+            <div class="game-over-actions">
+                <button id="new-game-btn" class="btn btn-primary">Nouvelle partie</button>
+                <button id="return-lobby-btn" class="btn btn-secondary">Retour au lobby</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="js/boards.js"></script>
+<script src="js/constants.js"></script>
+<script src="js/client.js"></script>
+</body>
+</html>
