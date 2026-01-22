@@ -1,35 +1,62 @@
 const { Pool } = require('pg');
 
-const pool = new Pool({
-    host: process.env.DB_HOST || '/cloudsql/court-of-shadows-game:europe-west1:court-of-shadows-db',
+const isProduction = process.env.NODE_ENV === 'production';
+
+const poolConfig = {
     user: process.env.DB_USER || 'appuser',
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME || 'courtdb',
-    port: process.env.DB_PORT || 5432
+    port: parseInt(process.env.DB_PORT || '5432')
+};
+
+if (isProduction) {
+    poolConfig.host = `/cloudsql/court-of-shadows-game:europe-west1:court-of-shadows-db`;
+} else {
+    poolConfig.host = process.env.DB_HOST || 'localhost';
+}
+
+console.log('Configuration DB:', {
+    user: poolConfig.user,
+    database: poolConfig.database,
+    host: poolConfig.host,
+    port: poolConfig.port,
+    hasPassword: !!poolConfig.password
 });
 
+const pool = new Pool(poolConfig);
+
 pool.on('error', (err) => {
-    console.error('Erreur inattendue du pool PostgreSQL', err);
+    console.error('❌ Erreur PostgreSQL:', err);
+});
+
+pool.on('connect', () => {
+    console.log('✅ Connecté à PostgreSQL');
 });
 
 async function initDatabase() {
     const client = await pool.connect();
 
     try {
+        console.log('🔧 Initialisation de la base de données...');
+
+        const result = await client.query('SELECT NOW()');
+        console.log('✅ Connexion DB réussie:', result.rows[0].now);
+
         await client.query(`
             CREATE TABLE IF NOT EXISTS users (
-                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                                 id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                 username VARCHAR(20) UNIQUE NOT NULL,
                 email VARCHAR(255) UNIQUE,
                 password_hash VARCHAR(255) NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 last_login TIMESTAMP,
                 is_premium BOOLEAN DEFAULT FALSE,
-                premium_until TIMESTAMP,
-                INDEX idx_username (username),
-                INDEX idx_email (email)
-            )
+                premium_until TIMESTAMP
+                )
         `);
+
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_username ON users(username)`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_email ON users(email)`);
 
         await client.query(`
             CREATE TABLE IF NOT EXISTS user_stats (
@@ -39,41 +66,7 @@ async function initDatabase() {
                 times_as_loyalist INTEGER DEFAULT 0,
                 times_as_conspirator INTEGER DEFAULT 0,
                 times_as_usurper INTEGER DEFAULT 0,
-                loyalist_wins INTEGER DEFAULT 0,
-                conspirator_wins INTEGER DEFAULT 0,
-                usurper_wins INTEGER DEFAULT 0,
-                total_votes_cast INTEGER DEFAULT 0,
-                total_decrees_played INTEGER DEFAULT 0,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        `);
-
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS game_history (
-                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-                room_id VARCHAR(10) NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                ended_at TIMESTAMP,
-                winner_faction VARCHAR(20),
-                reason TEXT,
-                duration_seconds INTEGER,
-                player_count INTEGER,
-                plots_count INTEGER,
-                edits_count INTEGER,
-                INDEX idx_created_at (created_at)
-            )
-        `);
-
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS game_participants (
-                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-                game_id UUID REFERENCES game_history(id) ON DELETE CASCADE,
-                user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-                role VARCHAR(20) NOT NULL,
-                faction VARCHAR(20) NOT NULL,
-                is_alive BOOLEAN,
-                won BOOLEAN,
-                INDEX idx_game_user (game_id, user_id)
             )
         `);
 
@@ -83,11 +76,12 @@ async function initDatabase() {
                 user_id UUID REFERENCES users(id) ON DELETE CASCADE,
                 token VARCHAR(64) UNIQUE NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                expires_at TIMESTAMP NOT NULL,
-                INDEX idx_token (token),
-                INDEX idx_expires (expires_at)
+                expires_at TIMESTAMP NOT NULL
             )
         `);
+
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_token ON sessions(token)`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_expires ON sessions(expires_at)`);
 
         console.log('✅ Base de données initialisée');
     } catch (error) {
