@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "court-of-shadows-game",
+  "private_key_id": "8fc805b5605b460a3e96a88fd0e7f49f243d844b",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDRrleOva1WLUXy\nvGijflOhL6ZddBd/k9eCXud/FGu5vl8XwTPYDgVcxHJXsjjFmP2gZup+IV4hiwNs\nBFY34m0JNrz6H0i/KY65CfsfvXUSq1d9uzTBKVkvLv0DIPW/sSkfnq+4C4usNbCW\nrYoHpsWM6LSxQII7jrGw7Zj8uhcytn422XclUW/eOBhbI0YDjcjQIub5WvcUdTah\nRyvOq1QRUrYeu5FHHD5F29XEDzfo+UcYDuaa5JU5+IkA1Fio3//lmS6SQCMXExWq\ns/V4KVcgz0rxlByeGnVDrtfxDl7T8M14lpdLUdI3tYj9iRUKPxooosDN+rPtDMMp\nuc3SoJk3AgMBAAECggEAETdUXxb51XqQJLcNjGcB7NkhusieaU41QrISJeACXFTi\nL+wgGpxEGnLSxJqQiMDgCjyJAmQw+2YTmNneTmZb94a0C4FoErIR0uWb5eZDZ44D\n+AHX+ggwF2yvP4OESgH802jPGrhv9mrOHgEPtUMfM0ukEm2ug79anaFUj2OkJfip\n4j/M0N9IAtKXC6rAVA2/KHlUevb+1XjPOImQFl9NnsS+iCG9buaFIEuD/0hcHeHb\nyPQ8M5GtX+Vykq9T+Lvi5nNFI1gybui5ge+e9fjweoq4/3ontoNPSyH1+1XCxcky\nUvp1zRkIFMu7uOimRtQw7pbRfMiSmEdel6Ll1tXUAQKBgQDulhTUNkAQI7MhE2+V\ndMRM/JlEcQxFQFmnykU2az4nAXWxC29xvLtFzxsv5E/ie3vT0eisboSE5ir9bjPW\nm/TkhBDIfIrR+FWWSVfLoHO9nG7cO33ijabHDGCNr4V+yD49I21YrvRt0FDLfAfq\nBiWSC1Y0sh+NcR63Y8FLYcjGAQKBgQDg/CyhwpSvmgt3VtciFJyD83wUCCpzxM43\nSSZfAe1Xx92HY37bz6ZhhJD2zu++7+TMcCgrn/CxoE/IXfdlXCMesflECiGz7YpV\nuI76bgzs8L4U4WuRJFZJ3BfDjsLEwmLe6vwC7Oq6eZNvHqBeR2VUaT2CkLJohmXk\nnnXYtOQPNwKBgQCpJOFzaVqVlpmh82OCM5wPcG1AZlzqo6psGCxlXjZb9N75O0Ax\nBDpITYHavCQeTqkFDKXFyTxN89e6f+xkU4CUmUREvna0UThsKWcCx6gGXucBX3Pp\nr77zEsVI7YzYyyHEul8FJlPHno4JFM+Pi/gKx9q/1SAlaHL8VM5uoM50AQKBgQCo\nN8SDOgKD/XC/TP3TrIeOHTpTm/tpzefF7Hq1JLK6JGUdeqX6Yhrr5Puinf0hzSpM\nNTvDynVjyhJ9JMz6S1ay960BU3X5mw0IpNK6qhgd/K6S3CzaO8oMtXRLMm2sQg88\nz4OYCF5FCOvUdJjBhS5dW8ay3c+XWY3LzzMb0byHJwKBgQCx1gMRzZoijHGHRUzr\nAcIJzz62RbOc3bLHe6vzO1Gw8jKfHxjrZew78O0eVM4I3L0kFTLG1I28mqfzBi8F\ngjYx3q0KGTH/OLw3MRv0Ddcv9e+rx9sO4ci9RjIiygkrUTIklV9oSQRsAGLxWwA+\nRkVEk1Dld7g9RcjAHo5Td6cIjQ==\n-----END PRIVATE KEY-----\n",
+  "client_email": "github-actions@court-of-shadows-game.iam.gserviceaccount.com",
+  "client_id": "106547169596414731560",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/github-actions%40court-of-shadows-game.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
