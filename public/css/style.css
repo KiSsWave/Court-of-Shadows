@@ -2528,21 +2528,79 @@ input[type="password"]::placeholder {
    STYLES ADDITIONNELS POUR LES RÈGLES
    ======================================== */
 
+.rules-content {
+    padding: 50px 40px;
+}
+
+.rules-section {
+    margin-bottom: 50px;
+    padding: 25px;
+    background: rgba(10, 6, 18, 0.4);
+    border-radius: 12px;
+    border-left: 4px solid var(--gold);
+}
+
+.rules-section h2 {
+    margin-bottom: 25px;
+    margin-top: 0;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+    color: var(--gold);
+}
+
+.rules-section h3 {
+    margin-top: 20px;
+    margin-bottom: 15px;
+    color: var(--text-gold);
+    font-size: 1.2rem;
+}
+
+.rules-section p {
+    margin-bottom: 18px;
+    line-height: 1.8;
+    font-size: 1rem;
+    color: var(--text-light);
+}
+
+.rules-list {
+    margin: 20px 0;
+    padding-left: 30px;
+}
+
+.rules-list li {
+    margin-bottom: 12px;
+    line-height: 1.7;
+    color: var(--text-light);
+}
+
+.rules-list-numbered {
+    list-style-type: decimal;
+    margin: 20px 0;
+    padding-left: 30px;
+}
+
+.rules-list-numbered li {
+    margin-bottom: 12px;
+    line-height: 1.7;
+    color: var(--text-light);
+}
+
 .rules-highlight {
     background: rgba(212, 175, 55, 0.15);
-    padding: 15px;
+    padding: 20px;
     border-radius: 10px;
     border-left: 4px solid var(--gold);
-    margin: 15px 0;
+    margin: 25px 0;
     color: var(--text-light);
+    line-height: 1.7;
 }
 
 .faction {
     display: inline-block;
-    padding: 4px 12px;
+    padding: 6px 14px;
     border-radius: 6px;
     font-weight: 700;
-    margin: 0 2px;
+    margin: 5px 8px;
 }
 
 .faction.loyalists {
@@ -2559,10 +2617,10 @@ input[type="password"]::placeholder {
 
 .card-badge {
     display: inline-block;
-    padding: 6px 14px;
+    padding: 8px 16px;
     border-radius: 8px;
     font-weight: 700;
-    margin: 3px;
+    margin: 8px 5px;
 }
 
 .card-badge.card-edit {
@@ -2580,14 +2638,15 @@ input[type="password"]::placeholder {
 .rules-table {
     width: 100%;
     border-collapse: collapse;
-    margin: 20px 0;
+    margin: 30px 0;
 }
 
 .rules-table th,
 .rules-table td {
-    padding: 12px 15px;
+    padding: 15px 15px;
     text-align: center;
     border: 1px solid rgba(212, 175, 55, 0.3);
+    line-height: 1.6;
 }
 
 .rules-table th {
@@ -2611,6 +2670,25 @@ input[type="password"]::placeholder {
     text-align: left;
     font-weight: 700;
 }
+
+.rules-footer {
+    margin-top: 50px;
+    padding-top: 30px;
+    border-top: 2px solid rgba(212, 175, 55, 0.3);
+    text-align: center;
+    line-height: 1.8;
+}
+
+.rules-warning {
+    background: rgba(255, 0, 0, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+    border-left: 4px solid #ff6666;
+    margin: 25px 0;
+    color: var(--text-light);
+    line-height: 1.7;
+}
+
 
 
 
