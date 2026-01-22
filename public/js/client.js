@@ -756,9 +756,23 @@ class CourtOfShadowsClient {
                 this.refreshMyGames();
             });
         }
+
+        // Bouton pour afficher les règles depuis le lobby
+        const showRulesBtn = document.getElementById('show-rules-btn');
+        if (showRulesBtn) {
+            showRulesBtn.addEventListener('click', () => {
+                this.showScreen('rules-screen');
+            });
+        }
+
+        // Bouton pour fermer les règles et retourner au lobby
+        const closeRulesBtn = document.getElementById('close-rules-btn');
+        if (closeRulesBtn) {
+            closeRulesBtn.addEventListener('click', () => {
+                this.showScreen('lobby-screen');
+            });
+        }       
     }
-
-
 
     createGame() {
         if (!this.isAuthenticated) {
