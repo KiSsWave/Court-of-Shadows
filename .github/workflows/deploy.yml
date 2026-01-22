@@ -9,6 +9,7 @@ env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
   REGION: ${{ secrets.GCP_REGION }}
+  INSTANCE_CONNECTION_NAME: court-of-shadows-game:europe-west1:court-of-shadows-db
 
 jobs:
   deploy:
@@ -28,7 +29,15 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Deploy to Cloud Run with Cloud Build
-        run: gcloud run deploy $SERVICE_NAME --source . --region $REGION --allow-unauthenticated --quiet
+        run: |
+          gcloud run deploy $SERVICE_NAME \
+            --source . \
+            --region $REGION \
+            --allow-unauthenticated \
+            --set-env-vars "DB_USER=appuser,DB_NAME=courtdb,DB_PORT=5432" \
+            --set-secrets "DB_PASSWORD=db-password:latest" \
+            --add-cloudsql-instances $INSTANCE_CONNECTION_NAME \
+            --quiet
 
       - name: Show service URL
         run: gcloud run services describe $SERVICE_NAME --region $REGION --format 'value(status.url)'

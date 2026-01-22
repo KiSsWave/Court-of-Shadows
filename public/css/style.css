@@ -541,19 +541,6 @@ input[type="password"]::placeholder {
     box-shadow: var(--shadow-medium);
 }
 
-/* Effet de brillance au survol */
-.btn::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s ease, height 0.6s ease;
-}
 
 .btn:hover::before {
     width: 400px;
@@ -747,17 +734,10 @@ input[type="password"]::placeholder {
     overflow: hidden;
 }
 
+.btn::before,
+.vote-btn::before,
 .game-type-btn::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s ease, height 0.6s ease;
+    display: none;
 }
 
 .game-type-btn:hover {
@@ -1058,13 +1038,7 @@ input[type="password"]::placeholder {
 
 /* Effet de ripple */
 .progress-marker.active::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    border: 4px solid currentColor;
-    animation: ripple 2s ease-out infinite;
+    display: none;
 }
 
 @keyframes ripple {
@@ -1768,18 +1742,6 @@ input[type="password"]::placeholder {
     overflow: hidden;
 }
 
-.vote-btn::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s ease, height 0.6s ease;
-}
 
 .vote-btn:hover::before {
     width: 500px;

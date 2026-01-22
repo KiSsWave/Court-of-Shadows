@@ -1,3 +1,5 @@
+require('dotenv').config();
+const { initDatabase } = require('./db');
 const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
@@ -10,6 +12,12 @@ const { MESSAGE_TYPES, GAME_PHASES, POWERS, ROLES } = require('../shared/constan
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
+
+// Initialiser la base de données au démarrage
+initDatabase().catch(err => {
+    console.error('Impossible d\'initialiser la base de données:', err);
+    process.exit(1);
+});
 
 // Servir les fichiers statiques
 app.use(express.static(path.join(__dirname, '../public')));

@@ -1,17 +1,18 @@
-# Utiliser Node.js 20 LTS
 FROM node:20-alpine
 
-# Créer le répertoire de l'application
 WORKDIR /app
 
-# Copier les fichiers package
 COPY package*.json ./
 
-# Installer les dépendances
-RUN npm install --production
+RUN npm ci --only=production
 
-# Copier le reste de l'application
-COPY . .
+COPY server/ ./server/
+COPY shared/ ./shared/
+COPY public/ ./public/
 
-# Démarrer l'application
+EXPOSE 8080
+
+ENV PORT=8080
+ENV NODE_ENV=production
+
 CMD ["node", "server/server.js"]
