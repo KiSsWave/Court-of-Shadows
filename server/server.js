@@ -16,7 +16,7 @@ const wss = new WebSocket.Server({ server });
 // Initialiser la base de données au démarrage
 initDatabase().catch(err => {
     console.error('Impossible d\'initialiser la base de données:', err);
-    process.exit(1);
+    // process.exit(1);
 });
 
 // Servir les fichiers statiques
