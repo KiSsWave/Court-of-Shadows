@@ -400,25 +400,27 @@
 
             <!-- Distribution des Rôles -->
             <div class="rules-section">
-                <h2>Distribution des Rôles</h2>
-                <table class="rules-table">
-                    <thead>
-                        <tr>
-                            <th>Joueurs</th>
-                            <th>⚜️ Loyalistes</th>
-                            <th>🗡️ Conspirateurs</th>
-                            <th>👑💀 Usurpateur</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>5</td><td>3</td><td>1</td><td>1</td></tr>
-                        <tr><td>6</td><td>4</td><td>1</td><td>1</td></tr>
-                        <tr><td>7</td><td>4</td><td>2</td><td>1</td></tr>
-                        <tr><td>8</td><td>5</td><td>2</td><td>1</td></tr>
-                        <tr><td>9</td><td>5</td><td>3</td><td>1</td></tr>
-                        <tr><td>10</td><td>6</td><td>3</td><td>1</td></tr>
-                    </tbody>
-                </table>
+                <h2>📊 Distribution des Rôles</h2>
+                <div class="table-scroll-container">
+                    <table class="rules-table">
+                        <thead>
+                            <tr>
+                                <th>👥</th>
+                                <th>⚜️ Loyalistes</th>
+                                <th>🗡️ Conspirateurs</th>
+                                <th>👑💀 Usurpateur</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>5</td><td>3</td><td>1</td><td>1</td></tr>
+                            <tr><td>6</td><td>4</td><td>1</td><td>1</td></tr>
+                            <tr><td>7</td><td>4</td><td>2</td><td>1</td></tr>
+                            <tr><td>8</td><td>5</td><td>2</td><td>1</td></tr>
+                            <tr><td>9</td><td>5</td><td>3</td><td>1</td></tr>
+                            <tr><td>10</td><td>6</td><td>3</td><td>1</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- Les Décrets -->
@@ -517,6 +519,14 @@
                         </tr>
                     </tbody>
                 </table>
+                <!-- Version mobile 5-6 joueurs -->
+                <div class="power-cards-mobile">
+                    <div class="power-card-mobile"><span class="power-number">1</span><span class="power-name">-</span></div>
+                    <div class="power-card-mobile"><span class="power-number">2</span><span class="power-name">-</span></div>
+                    <div class="power-card-mobile"><span class="power-number">3</span><span class="power-name">👁️ Inspection</span></div>
+                    <div class="power-card-mobile"><span class="power-number">4</span><span class="power-name">💀 Exécution</span></div>
+                    <div class="power-card-mobile"><span class="power-number">5</span><span class="power-name">💀 Exécution + 🚫 Véto</span></div>
+                </div>
 
                 <h3>Plateau 7-8 joueurs</h3>
                 <table class="rules-table power-table">
@@ -541,6 +551,14 @@
                         </tr>
                     </tbody>
                 </table>
+                <!-- Version mobile 7-8 joueurs -->
+                <div class="power-cards-mobile">
+                    <div class="power-card-mobile"><span class="power-number">1</span><span class="power-name">-</span></div>
+                    <div class="power-card-mobile"><span class="power-number">2</span><span class="power-name">🔍 Enquête</span></div>
+                    <div class="power-card-mobile"><span class="power-number">3</span><span class="power-name">👑 Succession</span></div>
+                    <div class="power-card-mobile"><span class="power-number">4</span><span class="power-name">💀 Exécution</span></div>
+                    <div class="power-card-mobile"><span class="power-number">5</span><span class="power-name">💀 Exécution + 🚫 Véto</span></div>
+                </div>
 
                 <h3>Plateau 9-10 joueurs</h3>
                 <table class="rules-table power-table">
@@ -565,6 +583,14 @@
                         </tr>
                     </tbody>
                 </table>
+                <!-- Version mobile 9-10 joueurs -->
+                <div class="power-cards-mobile">
+                    <div class="power-card-mobile"><span class="power-number">1</span><span class="power-name">🔍 Enquête</span></div>
+                    <div class="power-card-mobile"><span class="power-number">2</span><span class="power-name">🔍 Enquête</span></div>
+                    <div class="power-card-mobile"><span class="power-number">3</span><span class="power-name">👑 Succession</span></div>
+                    <div class="power-card-mobile"><span class="power-number">4</span><span class="power-name">💀 Exécution</span></div>
+                    <div class="power-card-mobile"><span class="power-number">5</span><span class="power-name">💀 Exécution + 🚫 Véto</span></div>
+                </div>
 
                 <p style="margin-top: 15px; font-style: italic; color: #aaa;">
                     🚫 <strong>Véto :</strong> À partir de 5 Complots, le Chancelier peut proposer un véto.
@@ -646,6 +672,11 @@
     </div>
 </div>
     
+
+<!-- Footer discret -->
+<footer class="site-footer">
+    <span>Créé par KiSsWave</span>
+</footer>
 
 <script src="js/boards.js"></script>
 <script src="js/constants.js"></script>

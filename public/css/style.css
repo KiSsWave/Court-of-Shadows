@@ -2681,6 +2681,105 @@ input[type="password"]::placeholder {
     .share-option-label {
         font-size: 0.9rem;
     }
+
+    /* Règles mobile */
+    .rules-content {
+        padding: 20px 15px;
+    }
+
+    .rules-section {
+        padding: 15px;
+        margin-bottom: 25px;
+    }
+
+    .rules-section h2 {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+
+    .rules-section h3 {
+        font-size: 1rem;
+    }
+
+    .rules-section p {
+        font-size: 0.9rem;
+        line-height: 1.6;
+    }
+
+    .rules-list,
+    .rules-list-numbered {
+        padding-left: 20px;
+    }
+
+    .rules-list li,
+    .rules-list-numbered li {
+        font-size: 0.9rem;
+    }
+
+    .rules-highlight {
+        padding: 12px;
+        font-size: 0.85rem;
+    }
+
+    /* Tableaux règles mobile - scroll horizontal */
+    .rules-table-container {
+        overflow-x: auto;
+        margin: 15px -15px;
+        padding: 0 15px;
+    }
+
+    .rules-table {
+        font-size: 0.8rem;
+        margin: 15px 0;
+        min-width: 100%;
+    }
+
+    .rules-table th,
+    .rules-table td {
+        padding: 8px 6px;
+        white-space: nowrap;
+    }
+
+    .rules-table th {
+        font-size: 0.7rem;
+    }
+
+    /* Tableaux de pouvoirs - format carte sur mobile */
+    .power-table {
+        display: none;
+    }
+
+    .power-cards-mobile {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .power-card-mobile {
+        background: rgba(10, 6, 18, 0.6);
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        border-radius: 10px;
+        padding: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .power-card-mobile .power-number {
+        background: rgba(212, 175, 55, 0.2);
+        color: var(--gold);
+        font-weight: 700;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 0.85rem;
+    }
+
+    .power-card-mobile .power-name {
+        flex: 1;
+        text-align: right;
+        font-size: 0.9rem;
+        color: var(--text-light);
+    }
 }
 
 /* Très petit écran (iPhone SE, etc.) */
@@ -3208,6 +3307,17 @@ input[type="password"]::placeholder {
     background: rgba(212, 175, 55, 0.1);
 }
 
+/* Cartes de pouvoir mobile - cachées par défaut sur PC */
+.power-cards-mobile {
+    display: none;
+}
+
+/* Conteneur scroll pour tableaux */
+.table-scroll-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
 .power-table th:first-child,
 .power-table td:first-child {
     text-align: left;
@@ -3232,6 +3342,22 @@ input[type="password"]::placeholder {
     line-height: 1.7;
 }
 
+/* ========================================
+   FOOTER SITE
+   ======================================== */
 
+.site-footer {
+    position: fixed;
+    bottom: 10px;
+    right: 15px;
+    font-size: 0.7rem;
+    color: rgba(212, 175, 55, 0.3);
+    font-family: 'Cinzel', serif;
+    letter-spacing: 1px;
+    z-index: 5;
+    transition: color 0.3s ease;
+}
 
-
+.site-footer:hover {
+    color: rgba(212, 175, 55, 0.6);
+}
