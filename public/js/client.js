@@ -1,5 +1,71 @@
 // Client Court of Shadows - VERSION CORRIGÉE
 
+// === POPUP DE CONFIRMATION ===
+function showConfirmPopup(options = {}) {
+    return new Promise((resolve) => {
+        const overlay = document.getElementById('confirm-popup');
+        const icon = document.getElementById('confirm-popup-icon');
+        const title = document.getElementById('confirm-popup-title');
+        const message = document.getElementById('confirm-popup-message');
+        const cancelBtn = document.getElementById('confirm-popup-cancel');
+        const confirmBtn = document.getElementById('confirm-popup-confirm');
+
+        // Configurer le contenu
+        icon.textContent = options.icon || '⚠️';
+        title.textContent = options.title || 'Confirmation';
+        message.textContent = options.message || 'Êtes-vous sûr ?';
+        cancelBtn.textContent = options.cancelText || 'Annuler';
+        confirmBtn.textContent = options.confirmText || 'Confirmer';
+
+        // Configurer le style du bouton de confirmation
+        confirmBtn.className = 'btn ' + (options.confirmClass || 'btn-danger');
+
+        // Afficher la popup
+        overlay.style.display = 'flex';
+
+        // Fonction de nettoyage
+        const cleanup = () => {
+            overlay.style.display = 'none';
+            cancelBtn.onclick = null;
+            confirmBtn.onclick = null;
+            overlay.onclick = null;
+            document.removeEventListener('keydown', handleKeydown);
+        };
+
+        // Gestion du clavier (Escape pour annuler, Enter pour confirmer)
+        const handleKeydown = (e) => {
+            if (e.key === 'Escape') {
+                cleanup();
+                resolve(false);
+            } else if (e.key === 'Enter') {
+                cleanup();
+                resolve(true);
+            }
+        };
+        document.addEventListener('keydown', handleKeydown);
+
+        // Bouton Annuler
+        cancelBtn.onclick = () => {
+            cleanup();
+            resolve(false);
+        };
+
+        // Bouton Confirmer
+        confirmBtn.onclick = () => {
+            cleanup();
+            resolve(true);
+        };
+
+        // Clic sur l'overlay (en dehors de la popup) = annuler
+        overlay.onclick = (e) => {
+            if (e.target === overlay) {
+                cleanup();
+                resolve(false);
+            }
+        };
+    });
+}
+
 // === GESTIONNAIRE DE SONS ===
 class SoundManager {
     constructor() {
@@ -641,8 +707,20 @@ class CourtOfShadowsClient {
         }
     }
 
-    kickPlayer(targetPlayerId) {
-        if (confirm('Êtes-vous sûr de vouloir exclure ce joueur ?')) {
+    async kickPlayer(targetPlayerId) {
+        const targetPlayer = this.allPlayers.find(p => p.id === targetPlayerId);
+        const playerName = targetPlayer ? targetPlayer.name : 'ce joueur';
+
+        const confirmed = await showConfirmPopup({
+            icon: '🚫',
+            title: 'Exclure un joueur',
+            message: `Êtes-vous sûr de vouloir exclure ${playerName} de la partie ?`,
+            cancelText: 'Annuler',
+            confirmText: 'Exclure',
+            confirmClass: 'btn-danger'
+        });
+
+        if (confirmed) {
             this.send(MESSAGE_TYPES.KICK_PLAYER, {
                 playerId: this.playerId,
                 roomId: this.roomId,
@@ -1374,8 +1452,17 @@ class CourtOfShadowsClient {
         `;
 
         if (this.isHost) {
-            document.getElementById('force-resume-btn').onclick = () => {
-                if (confirm('Êtes-vous sûr ? Les joueurs déconnectés seront éliminés de la partie.')) {
+            document.getElementById('force-resume-btn').onclick = async () => {
+                const confirmed = await showConfirmPopup({
+                    icon: '⚠️',
+                    title: 'Forcer la reprise',
+                    message: 'Les joueurs déconnectés seront éliminés de la partie. Voulez-vous continuer ?',
+                    cancelText: 'Annuler',
+                    confirmText: 'Forcer la reprise',
+                    confirmClass: 'btn-danger'
+                });
+
+                if (confirmed) {
                     this.send(MESSAGE_TYPES.FORCE_RESUME, {
                         playerId: this.playerId,
                         roomId: this.roomId
