@@ -7,8 +7,8 @@ class GameManager {
         this.gameMetadata = new Map(); // roomId -> metadata
         this.playerToGame = new Map(); // username -> roomId (pour retrouver les parties en cours)
 
-        // Démarrer le nettoyage automatique toutes les 5 minutes
-        setInterval(() => this.cleanupInactiveGames(), 5 * 60 * 1000);
+        // Nettoyage automatique désactivé
+        // setInterval(() => this.cleanupInactiveGames(), 5 * 60 * 1000);
     }
 
     /**
