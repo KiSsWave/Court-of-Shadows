@@ -182,6 +182,10 @@ wss.on('connection', (ws) => {
                     handleForceResume(data);
                     break;
 
+                case MESSAGE_TYPES.KICK_PLAYER:
+                    handleKickPlayer(data);
+                    break;
+
                 case 'ping':
                     // Répondre au ping du client pour maintenir la connexion
                     ws.isAlive = true;
@@ -420,6 +424,44 @@ wss.on('connection', (ws) => {
         sendGameStateToAll(roomId);
 
         console.log(`Paramètres de la partie ${roomId} mis à jour:`, settings);
+    }
+
+    function handleKickPlayer(data) {
+        const { playerId: hostId, roomId, targetPlayerId } = data;
+        const game = gameManager.getGame(roomId);
+
+        if (!game) {
+            throw new Error('Partie introuvable');
+        }
+
+        const result = game.kickPlayer(hostId, targetPlayerId);
+
+        // Notifier le joueur kické
+        sendToPlayer(targetPlayerId, {
+            type: MESSAGE_TYPES.PLAYER_KICKED,
+            data: {
+                reason: 'Vous avez été exclu de la partie par le créateur'
+            }
+        });
+
+        // Déconnecter le joueur kické
+        const kickedConnection = playerConnections.get(targetPlayerId);
+        if (kickedConnection) {
+            playerConnections.delete(targetPlayerId);
+        }
+
+        // Notifier les autres joueurs
+        broadcastToGame(roomId, {
+            type: MESSAGE_TYPES.PLAYER_KICKED,
+            data: {
+                kickedPlayerName: result.kickedPlayerName
+            }
+        });
+
+        // Mettre à jour la liste des joueurs
+        sendPlayerList(roomId);
+
+        console.log(`Joueur ${result.kickedPlayerName} exclu de la partie ${roomId}`);
     }
 
     function handleNominateChancellor(data) {

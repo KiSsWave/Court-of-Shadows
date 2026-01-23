@@ -57,7 +57,8 @@ class Game {
         this.settings = {
             conspiratorsKnowUsurper: false, // Par défaut, les conspirateurs ne voient pas l'usurpateur
             usurperKnowsAllies: false, // Par défaut, l'usurpateur ne voit pas ses alliés
-            limitedConspiratorsKnowledge: false // 9-10 joueurs: chaque conspirateur ne connaît qu'un seul allié (chaîne circulaire)
+            limitedConspiratorsKnowledge: false, // 9-10 joueurs: chaque conspirateur ne connaît qu'un seul allié (chaîne circulaire)
+            previousKingCannotBeChancellor: false // Le roi précédent ne peut pas être élu chancelier
         };
 
         // Créateur de la partie
@@ -79,6 +80,9 @@ class Game {
         if (settings.limitedConspiratorsKnowledge !== undefined) {
             // Cette option n'est disponible que pour 9-10 joueurs
             this.settings.limitedConspiratorsKnowledge = settings.limitedConspiratorsKnowledge;
+        }
+        if (settings.previousKingCannotBeChancellor !== undefined) {
+            this.settings.previousKingCannotBeChancellor = settings.previousKingCannotBeChancellor;
         }
     }
 
@@ -118,6 +122,31 @@ class Game {
             newHost.isHost = true;
             this.hostId = newHost.id;
         }
+    }
+
+    kickPlayer(hostId, targetPlayerId) {
+        if (this.phase !== GAME_PHASES.LOBBY) {
+            throw new Error('Impossible de kick un joueur en cours de partie');
+        }
+
+        const host = this.players.get(hostId);
+        if (!host || !host.isHost) {
+            throw new Error('Seul le créateur peut kick un joueur');
+        }
+
+        if (hostId === targetPlayerId) {
+            throw new Error('Vous ne pouvez pas vous kick vous-même');
+        }
+
+        const targetPlayer = this.players.get(targetPlayerId);
+        if (!targetPlayer) {
+            throw new Error('Joueur introuvable');
+        }
+
+        const playerName = targetPlayer.name;
+        this.players.delete(targetPlayerId);
+
+        return { kickedPlayerName: playerName };
     }
 
     // === DÉMARRAGE DU JEU ===
@@ -203,6 +232,11 @@ class Game {
         // Vérifier l'inéligibilité (seul le chancelier précédent est inéligible)
         if (chancellorId === this.previousChancellorId) {
             throw new Error('Ce joueur est temporairement inéligible');
+        }
+
+        // Vérifier si le roi précédent est inéligible (si l'option est activée)
+        if (this.settings.previousKingCannotBeChancellor && chancellorId === this.previousKingId) {
+            throw new Error('Le roi précédent ne peut pas être élu chancelier');
         }
 
         this.nominatedChancellorId = chancellorId;

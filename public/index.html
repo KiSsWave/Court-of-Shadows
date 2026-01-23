@@ -190,6 +190,14 @@
                 </label>
                 <p class="setting-hint">9-10 joueurs uniquement : chaque conspirateur ne connaît qu'un seul allié (chaîne circulaire)</p>
             </div>
+            <div class="setting-item">
+                <label class="toggle-label">
+                    <input type="checkbox" id="setting-previous-king-cannot-be-chancellor">
+                    <span class="toggle-switch"></span>
+                    <span class="setting-text">Le Roi précédent ne peut être élu Chancelier</span>
+                </label>
+                <p class="setting-hint">Si activé, le roi du tour précédent sera inéligible au poste de chancelier</p>
+            </div>
         </div>
 
         <div class="waiting-actions">
@@ -411,7 +419,11 @@
 
                 <p class="rules-highlight">
                     <strong>Option de jeu :</strong> "Connaissance limitée entre Conspirateurs" (9-10 joueurs) - Si activée, chaque Conspirateur ne connaît qu'un seul autre Conspirateur dans une chaîne circulaire, rendant la coordination plus difficile.
-                </p
+                </p>
+
+                <p class="rules-highlight">
+                    <strong>Option de jeu :</strong> "Le Roi précédent ne peut être élu Chancelier" - Si activée, le Roi du tour précédent est également inéligible au poste de Chancelier, en plus du Chancelier précédent.
+                </p>
             </div>
 
             <!-- Distribution des Rôles -->
@@ -476,6 +488,7 @@
                 </p>
                 <p class="rules-highlight">
                     <strong>Restriction :</strong> Le Chancelier du tour précédent ne peut pas être renommé immédiatement.
+                    Si l'option "Le Roi précédent ne peut être élu Chancelier" est activée, le Roi du tour précédent est également inéligible.
                 </p>
 
                 <h3>2. 🗳️ Vote du Conseil</h3>

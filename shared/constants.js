@@ -50,6 +50,10 @@ const MESSAGE_TYPES = {
     FORCE_PAUSE: 'force_pause',
     FORCE_RESUME: 'force_resume',
 
+    // Kick
+    KICK_PLAYER: 'kick_player',
+    PLAYER_KICKED: 'player_kicked',
+
     // Chat
     CHAT_MESSAGE: 'chat_message',
     CHAT_BROADCAST: 'chat_broadcast',

@@ -622,6 +622,32 @@ class CourtOfShadowsClient {
             case 'veto_pending':
                 this.handleVetoPending(message.data);
                 break;
+            case MESSAGE_TYPES.PLAYER_KICKED:
+                this.handlePlayerKicked(message.data);
+                break;
+        }
+    }
+
+    handlePlayerKicked(data) {
+        if (data.reason) {
+            // C'est moi qui ai été kické
+            this.showError(data.reason);
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } else if (data.kickedPlayerName) {
+            // Un autre joueur a été kické
+            this.showNotification(`${data.kickedPlayerName} a été exclu de la partie`);
+        }
+    }
+
+    kickPlayer(targetPlayerId) {
+        if (confirm('Êtes-vous sûr de vouloir exclure ce joueur ?')) {
+            this.send(MESSAGE_TYPES.KICK_PLAYER, {
+                playerId: this.playerId,
+                roomId: this.roomId,
+                targetPlayerId
+            });
         }
     }
 
@@ -709,6 +735,13 @@ class CourtOfShadowsClient {
         if (settingLimitedKnowledge) {
             settingLimitedKnowledge.addEventListener('change', (e) => {
                 this.updateSettings({ limitedConspiratorsKnowledge: e.target.checked });
+            });
+        }
+
+        const settingPreviousKing = document.getElementById('setting-previous-king-cannot-be-chancellor');
+        if (settingPreviousKing) {
+            settingPreviousKing.addEventListener('change', (e) => {
+                this.updateSettings({ previousKingCannotBeChancellor: e.target.checked });
             });
         }
 
@@ -917,12 +950,28 @@ class CourtOfShadowsClient {
         players.forEach(player => {
             const div = document.createElement('div');
             div.className = 'player-item' + (player.isHost ? ' host' : '');
+
+            // Bouton kick visible uniquement pour l'hôte et pas sur soi-même
+            const showKickBtn = this.isHost && player.id !== this.playerId;
+
             div.innerHTML = `
                 <span class="player-icon">${player.isHost ? '👑' : '🎭'}</span>
-                <span>${player.name}</span>
+                <span class="player-name-text">${player.name}</span>
+                ${showKickBtn ? `<button class="kick-btn" data-player-id="${player.id}" title="Exclure ce joueur">✕</button>` : ''}
             `;
             container.appendChild(div);
         });
+
+        // Ajouter les listeners pour les boutons kick
+        if (this.isHost) {
+            container.querySelectorAll('.kick-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const targetId = btn.dataset.playerId;
+                    this.kickPlayer(targetId);
+                });
+            });
+        }
 
         // Afficher/masquer l'option "Connaissance limitée" selon le nombre de joueurs (9-10)
         const limitedKnowledgeContainer = document.getElementById('setting-limited-knowledge-container');
@@ -1447,8 +1496,10 @@ class CourtOfShadowsClient {
             if (player.id === this.playerId) return false;
             // Pas les joueurs morts
             if (!player.isAlive) return false;
-            // Pas le chancelier précédent (seul inéligible)
+            // Pas le chancelier précédent
             if (player.id === state.previousChancellorId) return false;
+            // Pas le roi précédent (si l'option est activée)
+            if (state.settings?.previousKingCannotBeChancellor && player.id === state.previousKingId) return false;
             return true;
         });
 
