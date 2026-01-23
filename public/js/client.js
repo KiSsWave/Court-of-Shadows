@@ -1019,6 +1019,20 @@ class CourtOfShadowsClient {
     updatePlayerList(players) {
         this.allPlayers = players; // SAUVEGARDER LA LISTE
 
+        // Mettre à jour le statut d'hôte du joueur actuel
+        const currentPlayer = players.find(p => p.id === this.playerId);
+        const wasHost = this.isHost;
+        if (currentPlayer) {
+            this.isHost = currentPlayer.isHost;
+        }
+
+        // Si on vient de devenir hôte, mettre à jour l'UI
+        if (!wasHost && this.isHost) {
+            document.getElementById('start-game-btn').style.display = 'block';
+            document.getElementById('game-settings').style.display = 'block';
+            this.showNotification('👑 Vous êtes maintenant le maître de la partie !');
+        }
+
         const container = document.getElementById('players-container');
         const count = document.getElementById('player-count');
 
@@ -1042,11 +1056,12 @@ class CourtOfShadowsClient {
 
         // Ajouter les listeners pour les boutons kick
         if (this.isHost) {
+            const self = this;
             container.querySelectorAll('.kick-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
+                btn.addEventListener('click', async (e) => {
                     e.stopPropagation();
                     const targetId = btn.dataset.playerId;
-                    this.kickPlayer(targetId);
+                    await self.kickPlayer(targetId);
                 });
             });
         }

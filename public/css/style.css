@@ -3522,16 +3522,34 @@ input[type="password"]::placeholder {
 
 .site-footer {
     position: fixed;
-    bottom: 10px;
-    right: 15px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
     font-size: 0.7rem;
     color: rgba(238, 192, 37, 0.6);
     font-family: 'Cinzel', serif;
     letter-spacing: 1px;
     z-index: 5;
+    pointer-events: none;
+}
+
+.site-footer span {
+    pointer-events: auto;
     transition: color 0.3s ease;
 }
 
-.site-footer:hover {
+.site-footer span:hover {
     color: rgba(238, 192, 37, 1);
+}
+
+.footer-version {
+    font-weight: 700;
+}
+
+.footer-credit {
+    text-align: right;
 }
