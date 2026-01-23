@@ -66,6 +66,63 @@ function showConfirmPopup(options = {}) {
     });
 }
 
+// === POPUP D'INFORMATION (un seul bouton) ===
+function showInfoPopup(options = {}) {
+    return new Promise((resolve) => {
+        const overlay = document.getElementById('confirm-popup');
+        const icon = document.getElementById('confirm-popup-icon');
+        const title = document.getElementById('confirm-popup-title');
+        const message = document.getElementById('confirm-popup-message');
+        const cancelBtn = document.getElementById('confirm-popup-cancel');
+        const confirmBtn = document.getElementById('confirm-popup-confirm');
+
+        // Configurer le contenu
+        icon.textContent = options.icon || 'ℹ️';
+        title.textContent = options.title || 'Information';
+        message.textContent = options.message || '';
+        confirmBtn.textContent = options.buttonText || 'OK';
+
+        // Cacher le bouton annuler
+        cancelBtn.style.display = 'none';
+        confirmBtn.className = 'btn btn-primary';
+
+        // Afficher la popup
+        overlay.style.display = 'flex';
+
+        // Fonction de nettoyage
+        const cleanup = () => {
+            overlay.style.display = 'none';
+            cancelBtn.style.display = ''; // Restaurer le bouton annuler
+            confirmBtn.onclick = null;
+            overlay.onclick = null;
+            document.removeEventListener('keydown', handleKeydown);
+        };
+
+        // Gestion du clavier (Enter ou Escape pour fermer)
+        const handleKeydown = (e) => {
+            if (e.key === 'Escape' || e.key === 'Enter') {
+                cleanup();
+                resolve();
+            }
+        };
+        document.addEventListener('keydown', handleKeydown);
+
+        // Bouton OK
+        confirmBtn.onclick = () => {
+            cleanup();
+            resolve();
+        };
+
+        // Clic sur l'overlay = fermer aussi
+        overlay.onclick = (e) => {
+            if (e.target === overlay) {
+                cleanup();
+                resolve();
+            }
+        };
+    });
+}
+
 // === GESTIONNAIRE DE SONS ===
 class SoundManager {
     constructor() {
@@ -706,13 +763,16 @@ class CourtOfShadowsClient {
         this.showWaitingRoom();
     }
 
-    handlePlayerKicked(data) {
+    async handlePlayerKicked(data) {
         if (data.reason) {
-            // C'est moi qui ai été kické
-            this.showError(data.reason);
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
+            // C'est moi qui ai été kické - afficher une popup et rediriger après OK
+            await showInfoPopup({
+                icon: '🚫',
+                title: 'Exclu de la partie',
+                message: data.reason,
+                buttonText: 'OK'
+            });
+            window.location.reload();
         } else if (data.kickedPlayerName) {
             // Un autre joueur a été kické
             this.showNotification(`${data.kickedPlayerName} a été exclu de la partie`);
