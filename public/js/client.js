@@ -1165,8 +1165,17 @@ class CourtOfShadowsClient {
         if (pauseBtn) {
             if (this.isHost) {
                 pauseBtn.style.display = 'inline-block';
-                pauseBtn.onclick = () => {
-                    if (confirm('Mettre la partie en pause ?')) {
+                pauseBtn.onclick = async () => {
+                    const confirmed = await showConfirmPopup({
+                        icon: '⏸️',
+                        title: 'Mettre en pause',
+                        message: 'Voulez-vous mettre la partie en pause ?',
+                        cancelText: 'Annuler',
+                        confirmText: 'Mettre en pause',
+                        confirmClass: 'btn-primary'
+                    });
+
+                    if (confirmed) {
                         this.send(MESSAGE_TYPES.FORCE_PAUSE, {
                             playerId: this.playerId,
                             roomId: this.roomId
@@ -1436,48 +1445,86 @@ class CourtOfShadowsClient {
 
     showPausedUI(state) {
         const container = document.getElementById('action-container');
-        const disconnectedNames = state.disconnectedPlayers ? state.disconnectedPlayers.join(', ') : 'Un joueur';
+        const hasDisconnectedPlayers = state.disconnectedPlayers && state.disconnectedPlayers.length > 0;
+        const disconnectedNames = hasDisconnectedPlayers ? state.disconnectedPlayers.join(', ') : '';
 
+        let pauseMessage = '';
         let hostButtons = '';
-        if (this.isHost) {
-            hostButtons = `
-                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2);">
-                    <p style="font-size: 0.9rem; color: #888; margin-bottom: 15px;">
-                        En tant que créateur, vous pouvez forcer la reprise (les joueurs déconnectés seront éliminés).
-                    </p>
-                    <button id="force-resume-btn" class="btn btn-danger">
-                        Forcer la reprise
-                    </button>
-                </div>
-            `;
-        }
 
-        container.innerHTML = `
-            <div class="action-content" style="text-align: center; padding: 60px 20px;">
-                <div style="font-size: 5rem; margin-bottom: 30px;">⏸️</div>
-                <h2 style="color: var(--gold); margin-bottom: 20px;">Partie en Pause</h2>
+        if (hasDisconnectedPlayers) {
+            // Pause automatique - joueur déconnecté
+            pauseMessage = `
                 <p style="font-size: 1.2rem; color: #ccc;">
                     En attente de reconnexion de : <strong>${disconnectedNames}</strong>
                 </p>
                 <p style="font-size: 1rem; color: #888; margin-top: 20px;">
                     La partie reprendra automatiquement quand le joueur se reconnectera.
                 </p>
+            `;
+
+            if (this.isHost) {
+                hostButtons = `
+                    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2);">
+                        <p style="font-size: 0.9rem; color: #888; margin-bottom: 15px;">
+                            En tant que créateur, vous pouvez forcer la reprise (les joueurs déconnectés seront éliminés).
+                        </p>
+                        <button id="force-resume-btn" class="btn btn-danger">
+                            Forcer la reprise
+                        </button>
+                    </div>
+                `;
+            }
+        } else {
+            // Pause manuelle par le créateur
+            pauseMessage = `
+                <p style="font-size: 1.2rem; color: #ccc;">
+                    Le créateur a mis la partie en pause.
+                </p>
+                <p style="font-size: 1rem; color: #888; margin-top: 20px;">
+                    En attente de la reprise par le créateur.
+                </p>
+            `;
+
+            if (this.isHost) {
+                hostButtons = `
+                    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2);">
+                        <button id="force-resume-btn" class="btn btn-primary">
+                            ▶️ Reprendre la partie
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        container.innerHTML = `
+            <div class="action-content" style="text-align: center; padding: 60px 20px;">
+                <div style="font-size: 5rem; margin-bottom: 30px;">⏸️</div>
+                <h2 style="color: var(--gold); margin-bottom: 20px;">Partie en Pause</h2>
+                ${pauseMessage}
                 ${hostButtons}
             </div>
         `;
 
         if (this.isHost) {
             document.getElementById('force-resume-btn').onclick = async () => {
-                const confirmed = await showConfirmPopup({
-                    icon: '⚠️',
-                    title: 'Forcer la reprise',
-                    message: 'Les joueurs déconnectés seront éliminés de la partie. Voulez-vous continuer ?',
-                    cancelText: 'Annuler',
-                    confirmText: 'Forcer la reprise',
-                    confirmClass: 'btn-danger'
-                });
+                if (hasDisconnectedPlayers) {
+                    const confirmed = await showConfirmPopup({
+                        icon: '⚠️',
+                        title: 'Forcer la reprise',
+                        message: 'Les joueurs déconnectés seront éliminés de la partie. Voulez-vous continuer ?',
+                        cancelText: 'Annuler',
+                        confirmText: 'Forcer la reprise',
+                        confirmClass: 'btn-danger'
+                    });
 
-                if (confirmed) {
+                    if (confirmed) {
+                        this.send(MESSAGE_TYPES.FORCE_RESUME, {
+                            playerId: this.playerId,
+                            roomId: this.roomId
+                        });
+                    }
+                } else {
+                    // Pause manuelle - pas besoin de confirmation
                     this.send(MESSAGE_TYPES.FORCE_RESUME, {
                         playerId: this.playerId,
                         roomId: this.roomId
@@ -1492,7 +1539,16 @@ class CourtOfShadowsClient {
     }
 
     handleGameResumed(data) {
-        this.showNotification(`▶️ ${data.playerName} s'est reconnecté ! La partie reprend.`);
+        if (data.message) {
+            // Message personnalisé du serveur
+            this.showNotification(`▶️ ${data.message}`);
+        } else if (data.playerName === 'Le créateur') {
+            // Reprise par le créateur
+            this.showNotification(`▶️ La partie reprend !`);
+        } else {
+            // Reconnexion d'un joueur
+            this.showNotification(`▶️ ${data.playerName} s'est reconnecté ! La partie reprend.`);
+        }
     }
 
     // === VÉTO ===

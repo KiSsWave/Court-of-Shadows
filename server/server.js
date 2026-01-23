@@ -752,9 +752,11 @@ wss.on('connection', (ws) => {
 
         const result = game.forceResume();
         if (result.success) {
-            let message = 'Le créateur a forcé la reprise de la partie.';
+            let message;
             if (result.removedPlayers.length > 0) {
-                message += ` Joueurs éliminés : ${result.removedPlayers.join(', ')}`;
+                message = `Le créateur a forcé la reprise. Joueurs éliminés : ${result.removedPlayers.join(', ')}`;
+            } else {
+                message = 'La partie reprend !';
             }
             broadcastToGame(roomId, {
                 type: MESSAGE_TYPES.GAME_RESUMED,
