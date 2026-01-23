@@ -56,7 +56,8 @@ class Game {
         // Paramètres de la partie
         this.settings = {
             conspiratorsKnowUsurper: false, // Par défaut, les conspirateurs ne voient pas l'usurpateur
-            usurperKnowsAllies: false // Par défaut, l'usurpateur ne voit pas ses alliés
+            usurperKnowsAllies: false, // Par défaut, l'usurpateur ne voit pas ses alliés
+            limitedConspiratorsKnowledge: false // 9-10 joueurs: chaque conspirateur ne connaît qu'un seul allié (chaîne circulaire)
         };
 
         // Créateur de la partie
@@ -74,6 +75,10 @@ class Game {
         }
         if (settings.usurperKnowsAllies !== undefined) {
             this.settings.usurperKnowsAllies = settings.usurperKnowsAllies;
+        }
+        if (settings.limitedConspiratorsKnowledge !== undefined) {
+            // Cette option n'est disponible que pour 9-10 joueurs
+            this.settings.limitedConspiratorsKnowledge = settings.limitedConspiratorsKnowledge;
         }
     }
 
@@ -803,16 +808,37 @@ class Game {
 
             // Les CONSPIRATEURS voient selon les règles
             if (player.role === ROLES.CONSPIRATOR) {
-                // Les conspirateurs se voient toujours entre eux
-                const otherConspirators = Array.from(this.players.values())
-                    .filter(p => p.role === ROLES.CONSPIRATOR && p.id !== player.id)
-                    .map(p => ({
-                        id: p.id,
-                        name: p.name,
-                        role: p.role,
-                        faction: p.faction
-                    }));
-                state.knownPlayers.push(...otherConspirators);
+                const allConspirators = Array.from(this.players.values())
+                    .filter(p => p.role === ROLES.CONSPIRATOR);
+
+                // Mode chaîne circulaire (9-10 joueurs avec option activée)
+                if (this.settings.limitedConspiratorsKnowledge && playerCount >= 9 && allConspirators.length >= 3) {
+                    // Trouver l'index du joueur actuel dans la liste des conspirateurs
+                    const myIndex = allConspirators.findIndex(p => p.id === player.id);
+                    // Chaque conspirateur ne voit que le suivant dans la chaîne (circulaire)
+                    const nextIndex = (myIndex + 1) % allConspirators.length;
+                    const knownAlly = allConspirators[nextIndex];
+
+                    if (knownAlly && knownAlly.id !== player.id) {
+                        state.knownPlayers.push({
+                            id: knownAlly.id,
+                            name: knownAlly.name,
+                            role: knownAlly.role,
+                            faction: knownAlly.faction
+                        });
+                    }
+                } else {
+                    // Mode normal: les conspirateurs se voient tous entre eux
+                    const otherConspirators = allConspirators
+                        .filter(p => p.id !== player.id)
+                        .map(p => ({
+                            id: p.id,
+                            name: p.name,
+                            role: p.role,
+                            faction: p.faction
+                        }));
+                    state.knownPlayers.push(...otherConspirators);
+                }
 
                 // Si le paramètre est activé : les conspirateurs voient l'usurpateur
                 if (this.settings.conspiratorsKnowUsurper) {

@@ -705,6 +705,13 @@ class CourtOfShadowsClient {
             });
         }
 
+        const settingLimitedKnowledge = document.getElementById('setting-limited-conspirators-knowledge');
+        if (settingLimitedKnowledge) {
+            settingLimitedKnowledge.addEventListener('change', (e) => {
+                this.updateSettings({ limitedConspiratorsKnowledge: e.target.checked });
+            });
+        }
+
         // Chat
         const sendChatBtn = document.getElementById('send-chat-btn');
         const chatInput = document.getElementById('chat-input');
@@ -900,7 +907,7 @@ class CourtOfShadowsClient {
 
     updatePlayerList(players) {
         this.allPlayers = players; // SAUVEGARDER LA LISTE
-        
+
         const container = document.getElementById('players-container');
         const count = document.getElementById('player-count');
 
@@ -916,6 +923,22 @@ class CourtOfShadowsClient {
             `;
             container.appendChild(div);
         });
+
+        // Afficher/masquer l'option "Connaissance limitée" selon le nombre de joueurs (9-10)
+        const limitedKnowledgeContainer = document.getElementById('setting-limited-knowledge-container');
+        if (limitedKnowledgeContainer) {
+            if (players.length >= 9) {
+                limitedKnowledgeContainer.style.display = 'block';
+            } else {
+                limitedKnowledgeContainer.style.display = 'none';
+                // Réinitialiser l'option si on passe en dessous de 9 joueurs
+                const checkbox = document.getElementById('setting-limited-conspirators-knowledge');
+                if (checkbox && checkbox.checked) {
+                    checkbox.checked = false;
+                    this.updateSettings({ limitedConspiratorsKnowledge: false });
+                }
+            }
+        }
     }
 
     startGame() {

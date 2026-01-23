@@ -344,13 +344,35 @@ wss.on('connection', (ws) => {
         const conspirators = Array.from(game.players.values()).filter(p => p.role === ROLES.CONSPIRATOR);
 
         // Envoyer les rôles à chaque joueur
-        for (const [pid, p] of game.players.entries()) {
-            let allies = null;
+        const playerCount = game.players.size;
 
-            if (p.role === ROLES.CONSPIRATOR && game.settings.conspiratorsKnowUsurper && usurper) {
-                allies = [{ id: usurper.id, name: usurper.name, role: ROLES.USURPER }];
+        for (const [pid, p] of game.players.entries()) {
+            let allies = [];
+
+            // Conspirateurs: voir leurs alliés
+            if (p.role === ROLES.CONSPIRATOR) {
+                // Mode chaîne circulaire (9-10 joueurs avec option activée)
+                if (game.settings.limitedConspiratorsKnowledge && playerCount >= 9 && conspirators.length >= 3) {
+                    const myIndex = conspirators.findIndex(c => c.id === p.id);
+                    const nextIndex = (myIndex + 1) % conspirators.length;
+                    const knownAlly = conspirators[nextIndex];
+                    if (knownAlly) {
+                        allies.push({ id: knownAlly.id, name: knownAlly.name, role: ROLES.CONSPIRATOR });
+                    }
+                } else {
+                    // Mode normal: voir tous les autres conspirateurs
+                    allies = conspirators
+                        .filter(c => c.id !== p.id)
+                        .map(c => ({ id: c.id, name: c.name, role: ROLES.CONSPIRATOR }));
+                }
+
+                // Ajouter l'usurpateur si l'option est activée
+                if (game.settings.conspiratorsKnowUsurper && usurper) {
+                    allies.push({ id: usurper.id, name: usurper.name, role: ROLES.USURPER });
+                }
             }
 
+            // Usurpateur: voir ses alliés si l'option est activée
             if (p.role === ROLES.USURPER && game.settings.usurperKnowsAllies) {
                 allies = conspirators.map(c => ({ id: c.id, name: c.name, role: ROLES.CONSPIRATOR }));
             }
@@ -360,7 +382,7 @@ wss.on('connection', (ws) => {
                 data: {
                     role: p.role,
                     faction: p.faction,
-                    allies
+                    allies: allies.length > 0 ? allies : null
                 }
             });
         }

@@ -2425,6 +2425,11 @@ input[type="password"]::placeholder {
     }
 }
 
+/* Cartes de pouvoir mobile - cachées par défaut */
+.power-cards-mobile {
+    display: none;
+}
+
 /* Tablette - Lobby en colonne unique */
 @media (max-width: 900px) {
     .lobby-grid {
@@ -3307,11 +3312,6 @@ input[type="password"]::placeholder {
     background: rgba(212, 175, 55, 0.1);
 }
 
-/* Cartes de pouvoir mobile - cachées par défaut sur PC */
-.power-cards-mobile {
-    display: none;
-}
-
 /* Conteneur scroll pour tableaux */
 .table-scroll-container {
     overflow-x: auto;
@@ -3351,7 +3351,7 @@ input[type="password"]::placeholder {
     bottom: 10px;
     right: 15px;
     font-size: 0.7rem;
-    color: rgba(212, 175, 55, 0.3);
+    color: rgba(238, 192, 37, 0.6);
     font-family: 'Cinzel', serif;
     letter-spacing: 1px;
     z-index: 5;
@@ -3359,5 +3359,5 @@ input[type="password"]::placeholder {
 }
 
 .site-footer:hover {
-    color: rgba(212, 175, 55, 0.6);
+    color: rgba(238, 192, 37, 1);
 }
