@@ -202,9 +202,9 @@ wss.on('connection', (ws) => {
 
     // === HANDLERS ===
 
-    function handleRegister(ws, data) {
+    async function handleRegister(ws, data) {
         const { username, password } = data;
-        const result = auth.register(username, password);
+        const result = await auth.register(username, password);
 
         ws.send(JSON.stringify({
             type: 'register_result',
@@ -216,9 +216,9 @@ wss.on('connection', (ws) => {
         }
     }
 
-    function handleLogin(ws, data) {
+    async function handleLogin(ws, data) {
         const { username, password } = data;
-        const result = auth.login(username, password);
+        const result = await auth.login(username, password);
 
         ws.send(JSON.stringify({
             type: 'login_result',
