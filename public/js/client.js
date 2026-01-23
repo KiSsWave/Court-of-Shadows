@@ -2259,3 +2259,4 @@ document.head.appendChild(style);
 
 // Initialiser le client
 const client = new CourtOfShadowsClient();
+
