@@ -268,6 +268,19 @@ wss.on('connection', (ws) => {
 
         const game = gameManager.getGame(roomId);
 
+        // Vérifier si le joueur est déjà connecté à cette partie avec le même compte
+        if (username) {
+            for (const [existingPlayerId, connection] of playerConnections.entries()) {
+                if (connection.username === username && connection.roomId === roomId) {
+                    ws.send(JSON.stringify({
+                        type: MESSAGE_TYPES.ERROR,
+                        message: 'Vous êtes déjà connecté à cette partie dans un autre onglet'
+                    }));
+                    return;
+                }
+            }
+        }
+
         try {
             game.addPlayer(playerId, playerName);
             playerConnections.set(playerId, { ws, roomId, playerName, username });
