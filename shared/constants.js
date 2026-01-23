@@ -54,6 +54,10 @@ const MESSAGE_TYPES = {
     KICK_PLAYER: 'kick_player',
     PLAYER_KICKED: 'player_kicked',
 
+    // Arrêt de partie
+    STOP_GAME: 'stop_game',
+    GAME_STOPPED: 'game_stopped',
+
     // Chat
     CHAT_MESSAGE: 'chat_message',
     CHAT_BROADCAST: 'chat_broadcast',

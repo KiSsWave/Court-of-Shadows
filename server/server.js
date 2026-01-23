@@ -186,6 +186,10 @@ wss.on('connection', (ws) => {
                     handleKickPlayer(data);
                     break;
 
+                case MESSAGE_TYPES.STOP_GAME:
+                    handleStopGame(data);
+                    break;
+
                 case 'ping':
                     // Répondre au ping du client pour maintenir la connexion
                     ws.isAlive = true;
@@ -767,6 +771,30 @@ wss.on('connection', (ws) => {
             });
             sendPlayerList(roomId);
             sendGameStateToAll(roomId);
+        }
+    }
+
+    function handleStopGame(data) {
+        const { playerId, roomId } = data;
+        const game = gameManager.getGame(roomId);
+
+        if (!game) throw new Error('Partie introuvable');
+
+        const result = game.stopGame(playerId);
+
+        if (result.success) {
+            // Notifier tous les joueurs
+            broadcastToGame(roomId, {
+                type: MESSAGE_TYPES.GAME_STOPPED,
+                data: {
+                    message: 'Le créateur a arrêté la partie.'
+                }
+            });
+
+            // Renvoyer la liste des joueurs et l'état (lobby)
+            sendPlayerList(roomId);
+
+            console.log(`Partie ${roomId} arrêtée par le créateur`);
         }
     }
 

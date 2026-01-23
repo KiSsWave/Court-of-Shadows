@@ -742,6 +742,50 @@ class Game {
         return { success: true, removedPlayers };
     }
 
+    // Arrêter la partie et retourner au lobby
+    stopGame(hostId) {
+        if (this.hostId !== hostId) {
+            throw new Error('Seul le créateur peut arrêter la partie');
+        }
+
+        if (this.phase === GAME_PHASES.LOBBY) {
+            throw new Error('La partie n\'a pas encore commencé');
+        }
+
+        // Réinitialiser tous les joueurs
+        for (const player of this.players.values()) {
+            player.role = null;
+            player.faction = null;
+            player.isAlive = true;
+        }
+
+        // Réinitialiser l'état du jeu
+        this.phase = GAME_PHASES.LOBBY;
+        this.deck = [];
+        this.discardPile = [];
+        this.plotsCount = 0;
+        this.editsCount = 0;
+        this.currentKingId = null;
+        this.currentChancellorId = null;
+        this.previousKingId = null;
+        this.previousChancellorId = null;
+        this.nominatedChancellorId = null;
+        this.votes = new Map();
+        this.currentDecrees = [];
+        this.deadlockCount = 0;
+        this.playerOrder = [];
+        this.currentKingIndex = 0;
+        this.isPaused = false;
+        this.pausedPhase = null;
+        this.disconnectedPlayers = new Map();
+        this.vetoUnlocked = false;
+        this.vetoPending = false;
+        this.winningFaction = null;
+        this.gameOverReason = null;
+
+        return { success: true };
+    }
+
     getVoteDetails() {
         // Retourne les détails des votes pour affichage
         const details = [];

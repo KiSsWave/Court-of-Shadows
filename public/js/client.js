@@ -691,7 +691,19 @@ class CourtOfShadowsClient {
             case MESSAGE_TYPES.PLAYER_KICKED:
                 this.handlePlayerKicked(message.data);
                 break;
+            case MESSAGE_TYPES.GAME_STOPPED:
+                this.handleGameStopped(message.data);
+                break;
         }
+    }
+
+    handleGameStopped(data) {
+        this.showNotification(`🛑 ${data.message}`);
+        // Retourner à la salle d'attente
+        this.playerRole = null;
+        this.playerFaction = null;
+        this.knownPlayers = [];
+        this.showWaitingRoom();
     }
 
     handlePlayerKicked(data) {
@@ -1184,6 +1196,33 @@ class CourtOfShadowsClient {
                 };
             } else {
                 pauseBtn.style.display = 'none';
+            }
+        }
+
+        // Afficher le bouton arrêter pour le créateur
+        const stopBtn = document.getElementById('host-stop-btn');
+        if (stopBtn) {
+            if (this.isHost) {
+                stopBtn.style.display = 'inline-block';
+                stopBtn.onclick = async () => {
+                    const confirmed = await showConfirmPopup({
+                        icon: '🛑',
+                        title: 'Arrêter la partie',
+                        message: 'Voulez-vous arrêter la partie ? Tous les joueurs retourneront au lobby.',
+                        cancelText: 'Annuler',
+                        confirmText: 'Arrêter la partie',
+                        confirmClass: 'btn-danger'
+                    });
+
+                    if (confirmed) {
+                        this.send(MESSAGE_TYPES.STOP_GAME, {
+                            playerId: this.playerId,
+                            roomId: this.roomId
+                        });
+                    }
+                };
+            } else {
+                stopBtn.style.display = 'none';
             }
         }
     }
