@@ -182,6 +182,12 @@ wss.on('connection', (ws) => {
                     handleForceResume(data);
                     break;
 
+                case 'ping':
+                    // Répondre au ping du client pour maintenir la connexion
+                    ws.isAlive = true;
+                    ws.send(JSON.stringify({ type: 'pong' }));
+                    break;
+
                 default:
                     console.log('Type de message inconnu:', data.type);
             }

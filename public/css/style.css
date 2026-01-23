@@ -307,6 +307,93 @@ body::after {
 }
 
 /* ========================================
+   LOBBY - GRILLE PC/MOBILE
+   ======================================== */
+
+.lobby-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.lobby-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.lobby-column .form-card {
+    margin: 0;
+    height: fit-content;
+}
+
+.lobby-column .form-card h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.3rem;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.card-header h2 {
+    margin: 0 !important;
+    font-size: 1.2rem !important;
+}
+
+.btn-icon-small {
+    background: rgba(28, 28, 40, 0.9);
+    color: var(--gold);
+    border: 2px solid var(--gold);
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-icon-small:hover {
+    background: rgba(212, 175, 55, 0.2);
+    transform: scale(1.1);
+}
+
+.btn-full {
+    width: 100%;
+}
+
+.private-password-field {
+    display: none;
+    margin: 15px 0;
+}
+
+.games-list {
+    max-height: 250px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.games-list-empty {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 20px;
+    font-style: italic;
+}
+
+/* Bouton règles */
+.lobby-rules-desktop {
+    margin-top: 25px;
+}
+
+.lobby-rules-mobile {
+    display: none;
+}
+
+/* ========================================
    PARAMÈTRES DE PARTIE
    ======================================== */
 
@@ -1986,13 +2073,25 @@ input[type="password"]::placeholder {
     }
 }
 
+.chat-message .chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
 .chat-message .chat-author {
     color: var(--gold);
     font-weight: 700;
-    margin-bottom: 8px;
     font-size: 1rem;
     text-transform: uppercase;
     letter-spacing: 1px;
+}
+
+.chat-message .chat-time {
+    color: rgba(212, 175, 55, 0.6);
+    font-size: 0.8rem;
+    font-weight: 400;
 }
 
 .chat-message .chat-text {
@@ -2046,6 +2145,175 @@ input[type="password"]::placeholder {
     border-color: var(--bright-gold);
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+}
+
+/* Bouton pour ouvrir la popup de partage */
+.share-cards-open-btn {
+    width: 100%;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, rgba(28, 28, 40, 0.9) 0%, rgba(15, 27, 61, 0.9) 100%);
+    border: 2px solid rgba(212, 175, 55, 0.5);
+    border-radius: 10px;
+    color: var(--gold);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 1px;
+}
+
+.share-cards-open-btn:hover {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--bronze) 100%);
+    color: var(--midnight-black);
+    border-color: var(--bright-gold);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
+}
+
+/* Popup de partage de cartes */
+.share-cards-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    animation: fadeIn 0.2s ease;
+}
+
+.share-cards-popup-overlay.closing {
+    animation: fadeOut 0.2s ease forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+.share-cards-popup {
+    background: linear-gradient(145deg, rgba(20, 15, 35, 0.98) 0%, rgba(10, 6, 18, 0.98) 100%);
+    border: 2px solid var(--gold);
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 450px;
+    width: 90%;
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.8),
+        0 0 40px rgba(212, 175, 55, 0.2);
+    animation: popupSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes popupSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.share-cards-popup-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.share-cards-popup-header h3 {
+    color: var(--gold);
+    font-size: 1.5rem;
+    margin: 0 0 8px 0;
+    font-family: 'Cinzel Decorative', cursive;
+}
+
+.share-cards-popup-subtitle {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.share-cards-popup-warning {
+    background: rgba(255, 100, 100, 0.15);
+    border: 1px solid rgba(255, 100, 100, 0.4);
+    border-radius: 10px;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #ff9999;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.share-cards-popup-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.share-cards-option {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 20px;
+    background: linear-gradient(135deg, rgba(28, 28, 40, 0.8) 0%, rgba(15, 27, 61, 0.8) 100%);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Cinzel', serif;
+}
+
+.share-cards-option:hover {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(205, 127, 50, 0.2) 100%);
+    border-color: var(--gold);
+    transform: translateX(5px);
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+}
+
+.share-option-icons {
+    font-size: 1.8rem;
+    min-width: 80px;
+    text-align: center;
+}
+
+.share-option-label {
+    color: var(--text-light);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.share-cards-popup-footer {
+    display: flex;
+    justify-content: center;
+}
+
+.share-cards-cancel-btn {
+    padding: 12px 30px;
+    background: transparent;
+    border: 2px solid rgba(150, 150, 150, 0.4);
+    border-radius: 10px;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Cinzel', serif;
+}
+
+.share-cards-cancel-btn:hover {
+    border-color: rgba(255, 100, 100, 0.6);
+    color: #ff9999;
+    background: rgba(255, 100, 100, 0.1);
 }
 
 .chat-input {
@@ -2115,35 +2383,348 @@ input[type="password"]::placeholder {
    RESPONSIVE
    ======================================== */
 
+/* Tablette */
 @media (max-width: 1200px) {
     .game-main {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
     }
-    
+
+    .game-action {
+        grid-column: 1 / -1;
+        order: -1;
+    }
+
     .progression-boards-container {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
     }
-    
+
     .game-header {
         grid-template-columns: 1fr;
+        gap: 15px;
         text-align: center;
+    }
+
+    .score-board {
+        justify-content: center;
+    }
+
+    .header-right {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .progress-marker {
+        width: 70px;
+        height: 90px;
+    }
+
+    .marker-card {
+        width: 50px;
     }
 }
 
-@media (max-width: 768px) {
-    .title {
-        font-size: 2rem;
+/* Tablette - Lobby en colonne unique */
+@media (max-width: 900px) {
+    .lobby-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
     }
-    
+
+    .lobby-rules-desktop {
+        display: none;
+    }
+
+    .lobby-rules-mobile {
+        display: block;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .screen {
+        padding: 10px;
+    }
+
+    .container {
+        padding: 20px 10px;
+    }
+
+    .title {
+        font-size: 1.8rem;
+        letter-spacing: 2px;
+    }
+
+    .subtitle {
+        font-size: 0.9rem;
+    }
+
+    .logo-container img {
+        max-width: 120px;
+    }
+
+    .form-card,
+    .game-over-card,
+    .room-info,
+    .players-list,
+    .player-order,
+    .game-players,
+    .game-action,
+    .game-chat {
+        padding: 20px 15px;
+        border-radius: 15px;
+    }
+
+    .lobby-column .form-card h2 {
+        font-size: 1.1rem;
+    }
+
+    .card-header h2 {
+        font-size: 1rem !important;
+    }
+
     .players-row {
         flex-direction: column;
         align-items: center;
     }
-    
+
     .progress-marker {
-        width: 60px;
-        height: 60px;
+        width: 50px;
+        height: 65px;
+        font-size: 1rem;
+    }
+
+    .marker-card {
+        width: 35px;
+    }
+
+    .power-icon {
+        font-size: 0.6rem;
+    }
+
+    /* Game main mobile */
+    .game-main {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        min-height: auto;
+    }
+
+    .game-action {
+        order: -1;
+    }
+
+    .game-players,
+    .game-chat {
+        padding: 15px;
+    }
+
+    .game-players h3,
+    .game-chat h3 {
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+    }
+
+    /* Game header mobile */
+    .game-header {
+        padding: 15px;
+        gap: 15px;
+    }
+
+    .score-board {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .deck-info {
+        justify-content: center;
+    }
+
+    .scores-container {
+        flex-direction: row;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .score-item {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+    }
+
+    .phase-indicator {
+        font-size: 1rem;
+        padding: 10px 15px;
+    }
+
+    .header-right {
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .player-info-display,
+    .player-role-display,
+    .deadlock-counter {
+        font-size: 0.85rem;
+    }
+
+    /* Progression boards mobile */
+    .progression-boards-container {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .progression-board {
+        padding: 15px 10px;
+    }
+
+    .progress-markers {
+        gap: 5px;
+        justify-content: center;
+    }
+
+    /* User info mobile */
+    .user-info {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+        padding: 15px;
+    }
+
+    /* Boutons mobile */
+    .btn {
+        padding: 12px 20px;
+        font-size: 0.9rem;
+    }
+
+    .btn-icon {
+        padding: 10px 14px;
+        font-size: 1.2rem;
+    }
+
+    /* Game type selector mobile */
+    .game-type-selector {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .game-type-btn {
+        width: 100%;
+        padding: 12px;
+    }
+
+    /* Auth tabs mobile */
+    .auth-tabs {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .auth-tab {
+        width: 100%;
+    }
+
+    /* Games list mobile */
+    .games-list {
+        max-height: 200px;
+    }
+
+    .game-item {
+        flex-direction: column;
+        gap: 12px;
+        padding: 15px;
+    }
+
+    .game-actions {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .game-actions .btn {
+        width: 100%;
+    }
+
+    /* Chat mobile */
+    #chat-messages {
+        height: 300px;
+        padding: 15px;
+    }
+
+    .chat-input {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .chat-input input {
+        width: 100%;
+    }
+
+    .chat-input button {
+        width: 100%;
+        padding: 12px;
+    }
+
+    /* Share cards popup mobile */
+    .share-cards-popup {
+        padding: 20px;
+        max-width: 95%;
+    }
+
+    .share-cards-popup-header h3 {
+        font-size: 1.2rem;
+    }
+
+    .share-option-icons {
         font-size: 1.5rem;
+        min-width: 60px;
+    }
+
+    .share-option-label {
+        font-size: 0.9rem;
+    }
+}
+
+/* Très petit écran (iPhone SE, etc.) */
+@media (max-width: 375px) {
+    .title {
+        font-size: 1.5rem;
+        letter-spacing: 1px;
+    }
+
+    .form-card,
+    .game-over-card,
+    .room-info,
+    .players-list {
+        padding: 15px 12px;
+    }
+
+    .lobby-column .form-card h2 {
+        font-size: 1rem;
+    }
+
+    .btn {
+        padding: 10px 16px;
+        font-size: 0.85rem;
+    }
+
+    input {
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+
+    #chat-messages {
+        height: 250px;
+    }
+
+    .chat-message {
+        padding: 10px;
+    }
+
+    .chat-message .chat-author {
+        font-size: 0.85rem;
+    }
+
+    .chat-message .chat-text {
+        font-size: 0.85rem;
     }
 }
 

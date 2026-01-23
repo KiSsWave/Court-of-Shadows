@@ -497,13 +497,23 @@ class CourtOfShadowsClient {
         const wsUrl = `${protocol}//${window.location.host}`;
 
         this.ws = new WebSocket(wsUrl);
+        this.pingInterval = null;
 
         this.ws.onopen = () => {
             console.log('✅ Connecté au serveur');
+
+            // Envoyer un ping toutes les 30 secondes pour maintenir la connexion
+            this.pingInterval = setInterval(() => {
+                if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+                    this.ws.send(JSON.stringify({ type: 'ping' }));
+                }
+            }, 30000);
         };
 
         this.ws.onmessage = (event) => {
             const message = JSON.parse(event.data);
+            // Ignorer les pong silencieusement
+            if (message.type === 'pong') return;
             this.handleMessage(message);
         };
 
@@ -514,6 +524,11 @@ class CourtOfShadowsClient {
 
         this.ws.onclose = () => {
             console.log('🔌 Connexion fermée');
+            // Nettoyer l'intervalle de ping
+            if (this.pingInterval) {
+                clearInterval(this.pingInterval);
+                this.pingInterval = null;
+            }
             this.showError('Connexion perdue. Rechargez la page.');
         };
     }
@@ -761,6 +776,14 @@ class CourtOfShadowsClient {
         const showRulesBtn = document.getElementById('show-rules-btn');
         if (showRulesBtn) {
             showRulesBtn.addEventListener('click', () => {
+                this.showScreen('rules-screen');
+            });
+        }
+
+        // Bouton règles mobile
+        const showRulesBtnMobile = document.getElementById('show-rules-btn-mobile');
+        if (showRulesBtnMobile) {
+            showRulesBtnMobile.addEventListener('click', () => {
                 this.showScreen('rules-screen');
             });
         }
@@ -1595,6 +1618,14 @@ class CourtOfShadowsClient {
 
         if (!message) return;
 
+        // Rate limiting: 500ms entre chaque message
+        const now = Date.now();
+        if (this.lastChatMessageTime && (now - this.lastChatMessageTime) < 500) {
+            this.showNotification('⏳ Attendez avant d\'envoyer un autre message');
+            return;
+        }
+        this.lastChatMessageTime = now;
+
         this.send(MESSAGE_TYPES.CHAT_MESSAGE, {
             playerId: this.playerId,
             roomId: this.roomId,
@@ -1614,29 +1645,83 @@ class CourtOfShadowsClient {
             return;
         }
 
-        const { role, cards } = this.lastReceivedCards;
+        const { role } = this.lastReceivedCards;
         const roleLabel = role === 'king' ? 'Roi' : 'Chancelier';
-
-        // Créer les boutons pour chaque combinaison possible
-        const cardIcons = cards.map(c => c === DECREE_TYPES.PLOT ? '🗡️' : '⚜️').join('');
-        const cardLetters = cards.map(c => c === DECREE_TYPES.PLOT ? 'R' : 'B').join('');
 
         container.innerHTML = `
             <div class="share-cards-section">
-                <span class="share-cards-label">Partager mes cartes (${roleLabel}) :</span>
-                <div class="share-cards-buttons">
-                    <button class="share-card-btn" data-message="J'avais : ${cardIcons}">
-                        ${cardIcons}
-                    </button>
-                    <button class="share-card-btn" data-message="J'avais : ${cardLetters}">
-                        ${cardLetters}
-                    </button>
+                <button class="share-cards-open-btn" id="open-share-popup">
+                    📢 Déclarer mes cartes (${roleLabel})
+                </button>
+            </div>
+        `;
+
+        document.getElementById('open-share-popup').onclick = () => {
+            this.openShareCardsPopup();
+        };
+    }
+
+    // Ouvrir la popup de partage de cartes avec TOUTES les combinaisons
+    openShareCardsPopup() {
+        if (!this.lastReceivedCards) return;
+
+        const { role } = this.lastReceivedCards;
+        const roleLabel = role === 'king' ? 'Roi' : 'Chancelier';
+        const isKing = role === 'king';
+
+        // Générer toutes les combinaisons possibles
+        const combinations = isKing ? [
+            { icons: '🗡️🗡️🗡️', label: '3 Complots', letters: 'RRR' },
+            { icons: '🗡️🗡️⚜️', label: '2 Complots, 1 Édit', letters: 'RRB' },
+            { icons: '🗡️⚜️⚜️', label: '1 Complot, 2 Édits', letters: 'RBB' },
+            { icons: '⚜️⚜️⚜️', label: '3 Édits', letters: 'BBB' }
+        ] : [
+            { icons: '🗡️🗡️', label: '2 Complots', letters: 'RR' },
+            { icons: '🗡️⚜️', label: '1 Complot, 1 Édit', letters: 'RB' },
+            { icons: '⚜️⚜️', label: '2 Édits', letters: 'BB' }
+        ];
+
+        // Créer la popup modale
+        const popup = document.createElement('div');
+        popup.className = 'share-cards-popup-overlay';
+        popup.innerHTML = `
+            <div class="share-cards-popup">
+                <div class="share-cards-popup-header">
+                    <h3>📢 Déclarer mes cartes</h3>
+                    <span class="share-cards-popup-subtitle">En tant que ${roleLabel} - Choisissez ce que vous voulez déclarer</span>
+                </div>
+                <div class="share-cards-popup-warning">
+                    ⚠️ Vous pouvez mentir ! Choisissez stratégiquement.
+                </div>
+                <div class="share-cards-popup-options">
+                    ${combinations.map(combo => `
+                        <button class="share-cards-option" data-message="J'avais : ${combo.icons}">
+                            <span class="share-option-icons">${combo.icons}</span>
+                            <span class="share-option-label">${combo.label}</span>
+                        </button>
+                    `).join('')}
+                </div>
+                <div class="share-cards-popup-footer">
+                    <button class="share-cards-cancel-btn" id="close-share-popup">Annuler</button>
                 </div>
             </div>
         `;
 
-        // Ajouter les événements
-        container.querySelectorAll('.share-card-btn').forEach(btn => {
+        document.body.appendChild(popup);
+
+        // Fermer la popup
+        const closePopup = () => {
+            popup.classList.add('closing');
+            setTimeout(() => popup.remove(), 200);
+        };
+
+        document.getElementById('close-share-popup').onclick = closePopup;
+        popup.onclick = (e) => {
+            if (e.target === popup) closePopup();
+        };
+
+        // Gérer les clics sur les options
+        popup.querySelectorAll('.share-cards-option').forEach(btn => {
             btn.onclick = () => {
                 const message = btn.dataset.message;
                 this.send(MESSAGE_TYPES.CHAT_MESSAGE, {
@@ -1644,6 +1729,7 @@ class CourtOfShadowsClient {
                     roomId: this.roomId,
                     message
                 });
+                closePopup();
             };
         });
     }
@@ -1651,10 +1737,17 @@ class CourtOfShadowsClient {
     handleChatMessage(data) {
         const container = document.getElementById('chat-messages');
 
+        // Formater le timestamp en HH:MM
+        const timestamp = data.timestamp ? new Date(data.timestamp) : new Date();
+        const timeStr = timestamp.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
         const messageDiv = document.createElement('div');
         messageDiv.className = 'chat-message';
         messageDiv.innerHTML = `
-            <div class="chat-author">${data.playerName}</div>
+            <div class="chat-header">
+                <span class="chat-author">${data.playerName}</span>
+                <span class="chat-time">${timeStr}</span>
+            </div>
             <div class="chat-text">${this.escapeHtml(data.message)}</div>
         `;
 

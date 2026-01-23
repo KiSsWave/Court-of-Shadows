@@ -833,6 +833,24 @@ class Game {
                     p.faction === FACTIONS.CONSPIRATORS
                 );
             }
+
+            // Si le joueur est l'Usurpateur et que le paramètre est activé : il voit ses alliés
+            if (player.role === ROLES.USURPER && this.settings.usurperKnowsAllies) {
+                const conspirators = Array.from(this.players.values())
+                    .filter(p => p.role === ROLES.CONSPIRATOR);
+
+                conspirators.forEach(c => {
+                    // Éviter les doublons
+                    if (!state.knownPlayers.find(kp => kp.id === c.id)) {
+                        state.knownPlayers.push({
+                            id: c.id,
+                            name: c.name,
+                            role: c.role,
+                            faction: c.faction
+                        });
+                    }
+                });
+            }
         }
 
         return state;

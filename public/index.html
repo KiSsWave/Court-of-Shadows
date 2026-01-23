@@ -55,78 +55,95 @@
             <button id="logout-btn" class="btn-icon" title="Déconnexion">Quitter</button>
         </div>
 
-        <!-- Section: Créer une partie -->
-        <div class="form-card">
-            <h2 style="text-align: center; margin-bottom: 20px;"> Créer une Partie</h2>
+        <!-- Grille du lobby -->
+        <div class="lobby-grid">
+            <!-- Colonne gauche: Actions -->
+            <div class="lobby-column lobby-actions">
+                <!-- Section: Créer une partie -->
+                <div class="form-card">
+                    <h2>🎮 Créer une Partie</h2>
 
-            <div class="create-game-options">
-                <div class="game-type-selector">
-                    <button class="game-type-btn active" data-type="public">
-                         Partie Publique
+                    <div class="create-game-options">
+                        <div class="game-type-selector">
+                            <button class="game-type-btn active" data-type="public">
+                                🌐 Publique
+                            </button>
+                            <button class="game-type-btn" data-type="private">
+                                🔒 Privée
+                            </button>
+                        </div>
+
+                        <div id="private-password-field" class="private-password-field">
+                            <input type="password" id="game-password" placeholder="Mot de passe de la partie" maxlength="20">
+                        </div>
+
+                        <button id="create-game-btn" class="btn btn-primary btn-full">
+                            Créer la Partie
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Section: Rejoindre avec code -->
+                <div class="form-card">
+                    <h2>🔑 Rejoindre avec Code</h2>
+
+                    <div class="join-game-form">
+                        <div class="input-group">
+                            <label for="room-code" class="input-label">Code de la partie</label>
+                            <input type="text" id="room-code" placeholder="Ex: ABC123" maxlength="10" class="input-with-icon">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="join-password" class="input-label">Mot de passe (optionnel)</label>
+                            <input type="password" id="join-password" placeholder="Si partie privée..." maxlength="20">
+                        </div>
+
+                        <button id="join-game-btn" class="btn btn-primary btn-full">
+                            🚪 Rejoindre la Partie
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Bouton règles (visible sur mobile uniquement dans cette colonne) -->
+                <div class="form-card lobby-rules-mobile">
+                    <button id="show-rules-btn-mobile" class="btn btn-secondary btn-full">
+                        📜 Consulter les Règles
                     </button>
-                    <button class="game-type-btn" data-type="private">
-                         Partie Privée
-                    </button>
+                </div>
+            </div>
+
+            <!-- Colonne droite: Listes de parties -->
+            <div class="lobby-column lobby-games">
+                <!-- Section: Parties publiques -->
+                <div class="form-card">
+                    <div class="card-header">
+                        <h2>🌍 Parties Publiques</h2>
+                        <button id="refresh-public-games" class="btn-icon-small" title="Actualiser">🔄</button>
+                    </div>
+
+                    <div id="public-games-list" class="games-list">
+                        <p class="games-list-empty">Chargement...</p>
+                    </div>
                 </div>
 
-                <div id="private-password-field" style="display: none; margin: 15px 0;">
-                    <input type="password" id="game-password" placeholder="Mot de passe de la partie" maxlength="20">
-                </div>
+                <!-- Section: Mes parties en cours -->
+                <div class="form-card">
+                    <div class="card-header">
+                        <h2>📋 Mes Parties en Cours</h2>
+                        <button id="refresh-my-games" class="btn-icon-small" title="Actualiser">🔄</button>
+                    </div>
 
-                <button id="create-game-btn" class="btn btn-primary" style="width: 100%;">
-                    Créer la Partie
-                </button>
+                    <div id="my-games-list" class="games-list">
+                        <p class="games-list-empty">Aucune partie en cours</p>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Section: Rejoindre avec code -->
-        <div class="form-card" style="margin-top: 20px;">
-            <h2 style="text-align: center; margin-bottom: 20px;">🔑 Rejoindre avec Code</h2>
-
-            <div class="join-game-form">
-                <div class="input-group">
-                    <label for="room-code" class="input-label">Code de la partie</label>
-                    <input type="text" id="room-code" placeholder="Ex: ABC123" maxlength="10" class="input-with-icon">
-                </div>
-
-                <div class="input-group">
-                    <label for="join-password" class="input-label">Mot de passe (optionnel)</label>
-                    <input type="password" id="join-password" placeholder="Si partie privée..." maxlength="20">
-                </div>
-
-                <button id="join-game-btn" class="btn btn-primary" style="width: 100%; margin-bottom: 0;">
-                    🚪 Rejoindre la Partie
-                </button>
-            </div>
-        </div>
-
-        <!-- Section: Parties publiques -->
-        <div class="form-card" style="margin-top: 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h2 style="margin: 0;"> Parties Publiques</h2>
-                <button id="refresh-public-games" class="btn-icon" title="Actualiser">🔄</button>
-            </div>
-
-            <div id="public-games-list" class="games-list">
-                <p style="text-align: center; color: #888;">Chargement...</p>
-            </div>
-        </div>
-
-        <!-- Section: Mes parties en cours -->
-        <div class="form-card" style="margin-top: 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h2 style="margin: 0;"> Mes Parties en Cours</h2>
-                <button id="refresh-my-games" class="btn-icon" title="Actualiser">🔄</button>
-            </div>
-
-            <div id="my-games-list" class="games-list">
-                <p style="text-align: center; color: #888;">Aucune partie en cours</p>
-            </div>
-        </div>
-
-        <div class="form-card" style="margin-top: 20px; text-align: center;">
-            <button id="show-rules-btn" class="btn btn-secondary" style="width: 100%;">
-                Consulter les Règles
+        <!-- Bouton règles (pleine largeur sur PC) -->
+        <div class="lobby-rules-desktop">
+            <button id="show-rules-btn" class="btn btn-secondary btn-full">
+                📜 Consulter les Règles du Jeu
             </button>
         </div>     
     </div>
