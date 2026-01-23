@@ -101,7 +101,15 @@ const MESSAGE_TYPES = {
     ERROR: 'error',
     CHAT_BROADCAST: 'chat_broadcast',
     VETO_PROPOSED: 'veto_proposed',
-    VETO_RESULT: 'veto_result'
+    VETO_RESULT: 'veto_result',
+
+    // Kick
+    KICK_PLAYER: 'kick_player',
+    PLAYER_KICKED: 'player_kicked',
+
+    // Arrêt de partie
+    STOP_GAME: 'stop_game',
+    GAME_STOPPED: 'game_stopped'
 };
 
 const VOTE_OPTIONS = {

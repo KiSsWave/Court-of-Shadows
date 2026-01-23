@@ -1536,6 +1536,15 @@ input[type="password"]::placeholder {
     color: #999;
 }
 
+/* Style pour le créateur de la partie */
+.game-player-item.is-host {
+    background: rgba(212, 175, 55, 0.08);
+}
+
+.game-player-item.is-host .player-order-number {
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
 .game-player-item .player-name {
     font-weight: 700;
     font-size: 1.1rem;

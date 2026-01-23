@@ -1339,6 +1339,9 @@ class CourtOfShadowsClient {
             if (!player.isAlive) {
                 div.classList.add('eliminated');
             }
+            if (player.isHost) {
+                div.classList.add('is-host');
+            }
 
             // Appliquer la classe de rôle si on connaît ce joueur
             const knownPlayer = this.knownPlayers.find(kp => kp.id === player.id);
