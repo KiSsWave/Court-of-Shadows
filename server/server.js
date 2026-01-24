@@ -634,6 +634,38 @@ wss.on('connection', (ws) => {
                 });
             }
 
+            // Vérifier si l'auto-pass a déclenché une fin de partie
+            if (result.autoPass) {
+                broadcastToGame(roomId, {
+                    type: MESSAGE_TYPES.DECREE_PASSED,
+                    data: {
+                        decree: result.autoPass,
+                        plotsCount: game.plotsCount,
+                        editsCount: game.editsCount,
+                        isDeadlock: true
+                    }
+                });
+
+                if (game.phase === GAME_PHASES.GAME_OVER) {
+                    const allRoles = Array.from(game.players.values()).map(p => ({
+                        id: p.id,
+                        name: p.name,
+                        role: p.role,
+                        faction: p.faction,
+                        isAlive: p.isAlive
+                    }));
+
+                    broadcastToGame(roomId, {
+                        type: MESSAGE_TYPES.GAME_OVER,
+                        data: {
+                            winner: game.winningFaction,
+                            reason: game.gameOverReason,
+                            allRoles
+                        }
+                    });
+                }
+            }
+
             if (game.phase === GAME_PHASES.LEGISLATIVE) {
                 const decrees = game.kingDrawDecrees();
                 sendToPlayer(game.currentKingId, {
