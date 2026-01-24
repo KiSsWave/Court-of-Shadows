@@ -666,10 +666,6 @@ class Game {
             return false; // Pas besoin de pause en lobby ou fin de partie
         }
 
-        this.isPaused = true;
-        this.pausedPhase = this.phase;
-        this.phase = GAME_PHASES.PAUSED;
-
         // Sauvegarder les infos du joueur déconnecté
         const playerData = this.players.get(disconnectedPlayerId);
         if (playerData) {
@@ -677,6 +673,13 @@ class Game {
                 odPlayerId: disconnectedPlayerId,
                 playerData: { ...playerData }
             });
+        }
+
+        // Si la partie n'est pas déjà en pause, la mettre en pause
+        if (this.phase !== GAME_PHASES.PAUSED) {
+            this.isPaused = true;
+            this.pausedPhase = this.phase;
+            this.phase = GAME_PHASES.PAUSED;
         }
 
         return true;
