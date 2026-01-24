@@ -103,9 +103,11 @@ const MESSAGE_TYPES = {
     VETO_PROPOSED: 'veto_proposed',
     VETO_RESULT: 'veto_result',
 
-    // Kick
+    // Kick & Ban
     KICK_PLAYER: 'kick_player',
     PLAYER_KICKED: 'player_kicked',
+    BAN_PLAYER: 'ban_player',
+    PLAYER_BANNED: 'player_banned',
 
     // Arrêt de partie
     STOP_GAME: 'stop_game',
