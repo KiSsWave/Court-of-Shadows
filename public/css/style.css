@@ -2996,43 +2996,104 @@ input[type="password"]::placeholder {
 }
 
 /* ========================================
-   BOUTON KICK (LOBBY)
+   CARTES JOUEURS (LOBBY)
    ======================================== */
 
-.player-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: relative;
+#players-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 15px;
+    padding: 10px 0;
 }
 
-.player-item .player-name-text {
-    flex: 1;
-}
-
-.kick-btn {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: rgba(139, 0, 0, 0.6);
-    border: 2px solid rgba(255, 100, 100, 0.4);
-    color: #ff6b6b;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
+.player-card {
+    background: linear-gradient(135deg,
+        rgba(26, 10, 46, 0.9) 0%,
+        rgba(15, 27, 61, 0.9) 100%
+    );
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
     transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 10px;
 }
 
-.kick-btn:hover {
-    background: rgba(200, 0, 0, 0.8);
-    border-color: #ff0000;
-    color: #fff;
-    transform: scale(1.1);
-    box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+.player-card:hover {
+    border-color: rgba(212, 175, 55, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+.player-card.host {
+    border-color: var(--gold);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+}
+
+.player-card.self {
+    background: linear-gradient(135deg,
+        rgba(46, 26, 10, 0.9) 0%,
+        rgba(61, 45, 15, 0.9) 100%
+    );
+}
+
+.player-card-icon {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+}
+
+.player-card-name {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-light);
+    margin-bottom: 12px;
+    word-break: break-word;
+}
+
+.player-card.host .player-card-name {
+    color: var(--gold);
+}
+
+.player-card-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.btn-kick, .btn-ban {
+    flex: 1;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid;
+}
+
+.btn-kick {
+    background: rgba(180, 140, 20, 0.3);
+    border-color: rgba(255, 200, 50, 0.5);
+    color: #ffc832;
+}
+
+.btn-kick:hover {
+    background: rgba(200, 160, 30, 0.5);
+    border-color: #ffc832;
+    transform: scale(1.05);
+}
+
+.btn-ban {
+    background: rgba(139, 0, 0, 0.4);
+    border-color: rgba(255, 100, 100, 0.5);
+    color: #ff6b6b;
+}
+
+.btn-ban:hover {
+    background: rgba(180, 0, 0, 0.6);
+    border-color: #ff4444;
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
 }
 
 /* ========================================

@@ -216,6 +216,10 @@ wss.on('connection', (ws) => {
                     handleKickPlayer(data);
                     break;
 
+                case MESSAGE_TYPES.BAN_PLAYER:
+                    handleBanPlayer(data);
+                    break;
+
                 case MESSAGE_TYPES.STOP_GAME:
                     handleStopGame(data);
                     break;
@@ -297,6 +301,15 @@ wss.on('connection', (ws) => {
         }
 
         const game = gameManager.getGame(roomId);
+
+        // Vérifier si le joueur est banni de cette partie
+        if (game.isPlayerBanned(playerName)) {
+            ws.send(JSON.stringify({
+                type: MESSAGE_TYPES.ERROR,
+                message: 'Vous êtes banni de cette partie'
+            }));
+            return;
+        }
 
         // Vérifier si le joueur est déjà connecté à cette partie avec le même compte
         if (username) {
@@ -509,6 +522,44 @@ wss.on('connection', (ws) => {
         sendPlayerList(roomId);
 
         console.log(`Joueur ${result.kickedPlayerName} exclu de la partie ${roomId}`);
+    }
+
+    function handleBanPlayer(data) {
+        const { playerId: hostId, roomId, targetPlayerId } = data;
+        const game = gameManager.getGame(roomId);
+
+        if (!game) {
+            throw new Error('Partie introuvable');
+        }
+
+        const result = game.banPlayer(hostId, targetPlayerId);
+
+        // Notifier le joueur banni
+        sendToPlayer(targetPlayerId, {
+            type: MESSAGE_TYPES.PLAYER_BANNED,
+            data: {
+                reason: 'Vous avez été banni de cette partie par le créateur'
+            }
+        });
+
+        // Déconnecter le joueur banni
+        const bannedConnection = playerConnections.get(targetPlayerId);
+        if (bannedConnection) {
+            playerConnections.delete(targetPlayerId);
+        }
+
+        // Notifier les autres joueurs
+        broadcastToGame(roomId, {
+            type: MESSAGE_TYPES.PLAYER_BANNED,
+            data: {
+                bannedPlayerName: result.bannedPlayerName
+            }
+        });
+
+        // Mettre à jour la liste des joueurs
+        sendPlayerList(roomId);
+
+        console.log(`Joueur ${result.bannedPlayerName} banni de la partie ${roomId}`);
     }
 
     function handleNominateChancellor(data) {

@@ -63,6 +63,9 @@ class Game {
 
         // Créateur de la partie
         this.hostId = null;
+
+        // Joueurs bannis (par username)
+        this.bannedPlayers = new Set();
     }
 
     // === PARAMÈTRES DE LA PARTIE ===
@@ -147,6 +150,40 @@ class Game {
         this.players.delete(targetPlayerId);
 
         return { kickedPlayerName: playerName };
+    }
+
+    banPlayer(hostId, targetPlayerId) {
+        if (this.phase !== GAME_PHASES.LOBBY) {
+            throw new Error('Impossible de bannir un joueur en cours de partie');
+        }
+
+        const host = this.players.get(hostId);
+        if (!host || !host.isHost) {
+            throw new Error('Seul le créateur peut bannir un joueur');
+        }
+
+        if (hostId === targetPlayerId) {
+            throw new Error('Vous ne pouvez pas vous bannir vous-même');
+        }
+
+        const targetPlayer = this.players.get(targetPlayerId);
+        if (!targetPlayer) {
+            throw new Error('Joueur introuvable');
+        }
+
+        const playerName = targetPlayer.name;
+
+        // Ajouter à la liste des bannis
+        this.bannedPlayers.add(playerName);
+
+        // Retirer le joueur de la partie
+        this.players.delete(targetPlayerId);
+
+        return { bannedPlayerName: playerName };
+    }
+
+    isPlayerBanned(username) {
+        return this.bannedPlayers.has(username);
     }
 
     // === DÉMARRAGE DU JEU ===
@@ -675,6 +712,7 @@ class Game {
         if (this.previousKingId === oldPlayerId) this.previousKingId = newPlayerId;
         if (this.previousChancellorId === oldPlayerId) this.previousChancellorId = newPlayerId;
         if (this.nominatedChancellorId === oldPlayerId) this.nominatedChancellorId = newPlayerId;
+        if (this.hostId === oldPlayerId) this.hostId = newPlayerId;
 
         // Mettre à jour les votes si présents
         if (this.votes.has(oldPlayerId)) {

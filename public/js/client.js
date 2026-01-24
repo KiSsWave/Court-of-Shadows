@@ -790,6 +790,9 @@ class CourtOfShadowsClient {
             case MESSAGE_TYPES.PLAYER_KICKED:
                 this.handlePlayerKicked(message.data);
                 break;
+            case MESSAGE_TYPES.PLAYER_BANNED:
+                this.handlePlayerBanned(message.data);
+                break;
             case MESSAGE_TYPES.GAME_STOPPED:
                 this.handleGameStopped(message.data);
                 break;
@@ -809,7 +812,7 @@ class CourtOfShadowsClient {
         if (data.reason) {
             // C'est moi qui ai été kické - afficher une popup et rediriger après OK
             await showInfoPopup({
-                icon: '🚫',
+                icon: '👢',
                 title: 'Exclu de la partie',
                 message: data.reason,
                 buttonText: 'OK'
@@ -817,7 +820,23 @@ class CourtOfShadowsClient {
             window.location.reload();
         } else if (data.kickedPlayerName) {
             // Un autre joueur a été kické
-            this.showNotification(`${data.kickedPlayerName} a été exclu de la partie`);
+            this.showNotification(`👢 ${data.kickedPlayerName} a été exclu de la partie`);
+        }
+    }
+
+    async handlePlayerBanned(data) {
+        if (data.reason) {
+            // C'est moi qui ai été banni - afficher une popup et rediriger après OK
+            await showInfoPopup({
+                icon: '🚫',
+                title: 'Banni de la partie',
+                message: data.reason,
+                buttonText: 'OK'
+            });
+            window.location.reload();
+        } else if (data.bannedPlayerName) {
+            // Un autre joueur a été banni
+            this.showNotification(`🚫 ${data.bannedPlayerName} a été banni de la partie`);
         }
     }
 
@@ -826,16 +845,38 @@ class CourtOfShadowsClient {
         const playerName = targetPlayer ? targetPlayer.name : 'ce joueur';
 
         const confirmed = await showConfirmPopup({
-            icon: '🚫',
+            icon: '👢',
             title: 'Exclure un joueur',
-            message: `Êtes-vous sûr de vouloir exclure ${playerName} de la partie ?`,
+            message: `Exclure ${playerName} de la partie ? Il pourra revenir.`,
             cancelText: 'Annuler',
             confirmText: 'Exclure',
-            confirmClass: 'btn-danger'
+            confirmClass: 'btn-warning'
         });
 
         if (confirmed) {
             this.send(MESSAGE_TYPES.KICK_PLAYER, {
+                playerId: this.playerId,
+                roomId: this.roomId,
+                targetPlayerId
+            });
+        }
+    }
+
+    async banPlayer(targetPlayerId) {
+        const targetPlayer = this.allPlayers.find(p => p.id === targetPlayerId);
+        const playerName = targetPlayer ? targetPlayer.name : 'ce joueur';
+
+        const confirmed = await showConfirmPopup({
+            icon: '🚫',
+            title: 'Bannir un joueur',
+            message: `Bannir ${playerName} définitivement de cette partie ?`,
+            cancelText: 'Annuler',
+            confirmText: 'Bannir',
+            confirmClass: 'btn-danger'
+        });
+
+        if (confirmed) {
+            this.send(MESSAGE_TYPES.BAN_PLAYER, {
                 playerId: this.playerId,
                 roomId: this.roomId,
                 targetPlayerId
@@ -1173,27 +1214,39 @@ class CourtOfShadowsClient {
 
         players.forEach(player => {
             const div = document.createElement('div');
-            div.className = 'player-item' + (player.isHost ? ' host' : '');
+            div.className = 'player-card' + (player.isHost ? ' host' : '') + (player.id === this.playerId ? ' self' : '');
 
-            // Bouton kick visible uniquement pour l'hôte et pas sur soi-même
-            const showKickBtn = this.isHost && player.id !== this.playerId;
+            // Boutons visibles uniquement pour l'hôte et pas sur soi-même
+            const showActions = this.isHost && player.id !== this.playerId;
 
             div.innerHTML = `
-                <span class="player-icon">${player.isHost ? '👑' : '🎭'}</span>
-                <span class="player-name-text">${player.name}</span>
-                ${showKickBtn ? `<button class="kick-btn" data-player-id="${player.id}" title="Exclure ce joueur">✕</button>` : ''}
+                <div class="player-card-icon">${player.isHost ? '👑' : '🎭'}</div>
+                <div class="player-card-name">${player.name}</div>
+                ${showActions ? `
+                    <div class="player-card-actions">
+                        <button class="btn-kick" data-player-id="${player.id}" title="Exclure">👢 Kick</button>
+                        <button class="btn-ban" data-player-id="${player.id}" title="Bannir">🚫 Ban</button>
+                    </div>
+                ` : ''}
             `;
             container.appendChild(div);
         });
 
-        // Ajouter les listeners pour les boutons kick
+        // Ajouter les listeners pour les boutons kick et ban
         if (this.isHost) {
             const self = this;
-            container.querySelectorAll('.kick-btn').forEach(btn => {
+            container.querySelectorAll('.btn-kick').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
                     e.stopPropagation();
                     const targetId = btn.dataset.playerId;
                     await self.kickPlayer(targetId);
+                });
+            });
+            container.querySelectorAll('.btn-ban').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const targetId = btn.dataset.playerId;
+                    await self.banPlayer(targetId);
                 });
             });
         }

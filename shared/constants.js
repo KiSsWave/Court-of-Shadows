@@ -50,9 +50,11 @@ const MESSAGE_TYPES = {
     FORCE_PAUSE: 'force_pause',
     FORCE_RESUME: 'force_resume',
 
-    // Kick
+    // Kick & Ban
     KICK_PLAYER: 'kick_player',
     PLAYER_KICKED: 'player_kicked',
+    BAN_PLAYER: 'ban_player',
+    PLAYER_BANNED: 'player_banned',
 
     // Arrêt de partie
     STOP_GAME: 'stop_game',
