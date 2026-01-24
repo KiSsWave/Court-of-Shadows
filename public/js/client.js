@@ -2342,7 +2342,12 @@ class CourtOfShadowsClient {
     }
 
     showError(message) {
-        alert('❌ ' + message);
+        showInfoPopup({
+            icon: '❌',
+            title: 'Erreur',
+            message: message,
+            buttonText: 'OK'
+        });
     }
 
     escapeHtml(text) {
