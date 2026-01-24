@@ -377,6 +377,8 @@ class CourtOfShadowsClient {
             return;
         }
 
+        // Sauvegarder temporairement pour la reconnexion automatique
+        sessionStorage.setItem('tempPassword', password);
         this.send('login', { username, password });
     }
 
@@ -429,8 +431,10 @@ class CourtOfShadowsClient {
         }
         this.user = null;
         this.isAuthenticated = false;
+        this.wasAuthenticated = false;
         this.playerName = null;
         localStorage.removeItem('courtOfShadows_user');
+        sessionStorage.removeItem('tempPassword');
         this.showScreen('auth-screen');
     }
 
@@ -616,6 +620,9 @@ class CourtOfShadowsClient {
 
     // === CONNEXION WEBSOCKET ===
     connect() {
+        // Éviter les reconnexions multiples simultanées
+        if (this.isReconnecting) return;
+
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         const wsUrl = `${protocol}//${window.location.host}`;
 
@@ -624,13 +631,24 @@ class CourtOfShadowsClient {
 
         this.ws.onopen = () => {
             console.log('✅ Connecté au serveur');
+            this.reconnectAttempts = 0;
+            this.isReconnecting = false;
 
-            // Envoyer un ping toutes les 30 secondes pour maintenir la connexion
+            // Envoyer un ping toutes les 15 secondes pour maintenir la connexion
             this.pingInterval = setInterval(() => {
                 if (this.ws && this.ws.readyState === WebSocket.OPEN) {
                     this.ws.send(JSON.stringify({ type: 'ping' }));
                 }
-            }, 30000);
+            }, 15000);
+
+            // Si on était authentifié avant, se ré-authentifier automatiquement
+            if (this.playerName && this.wasAuthenticated) {
+                console.log('🔄 Ré-authentification automatique...');
+                const savedPassword = sessionStorage.getItem('tempPassword');
+                if (savedPassword) {
+                    this.send('login', { username: this.playerName, password: savedPassword });
+                }
+            }
         };
 
         this.ws.onmessage = (event) => {
@@ -642,7 +660,7 @@ class CourtOfShadowsClient {
 
         this.ws.onerror = (error) => {
             console.error('❌ Erreur WebSocket:', error);
-            this.showError('Erreur de connexion au serveur');
+            // Ne pas afficher d'erreur, la reconnexion automatique s'en chargera
         };
 
         this.ws.onclose = () => {
@@ -652,8 +670,32 @@ class CourtOfShadowsClient {
                 clearInterval(this.pingInterval);
                 this.pingInterval = null;
             }
-            this.showError('Connexion perdue. Rechargez la page.');
+
+            // Sauvegarder l'état d'authentification pour la reconnexion
+            if (this.isAuthenticated) {
+                this.wasAuthenticated = true;
+            }
+
+            // Reconnexion automatique silencieuse
+            this.autoReconnect();
         };
+    }
+
+    autoReconnect() {
+        if (this.isReconnecting) return;
+
+        this.isReconnecting = true;
+        this.reconnectAttempts = (this.reconnectAttempts || 0) + 1;
+
+        // Délai exponentiel avec maximum de 10 secondes
+        const delay = Math.min(1000 * Math.pow(1.5, this.reconnectAttempts - 1), 10000);
+
+        console.log(`🔄 Reconnexion automatique dans ${Math.round(delay/1000)}s (tentative ${this.reconnectAttempts})...`);
+
+        setTimeout(() => {
+            this.isReconnecting = false;
+            this.connect();
+        }, delay);
     }
 
     send(type, data = {}) {
@@ -1063,11 +1105,29 @@ class CourtOfShadowsClient {
         this.showScreen('waiting-room');
         document.getElementById('display-room-code').textContent = this.roomId;
 
+        // Afficher les paramètres pour tous les joueurs
+        const gameSettings = document.getElementById('game-settings');
+        if (gameSettings) {
+            gameSettings.style.display = 'block';
+
+            // Désactiver les contrôles pour les non-hôtes
+            const settingsInputs = gameSettings.querySelectorAll('input');
+            settingsInputs.forEach(input => {
+                input.disabled = !this.isHost;
+            });
+
+            // Ajouter une classe pour le style visuel
+            if (this.isHost) {
+                gameSettings.classList.remove('settings-readonly');
+            } else {
+                gameSettings.classList.add('settings-readonly');
+            }
+        }
+
         if (this.isHost) {
             document.getElementById('start-game-btn').style.display = 'block';
-            document.getElementById('game-settings').style.display = 'block';
         } else {
-            document.getElementById('game-settings').style.display = 'none';
+            document.getElementById('start-game-btn').style.display = 'none';
         }
     }
 
@@ -1232,58 +1292,94 @@ class CourtOfShadowsClient {
             nameElement.textContent = this.playerName;
         }
 
-        // Afficher le bouton pause pour le créateur
-        const pauseBtn = document.getElementById('host-pause-btn');
-        if (pauseBtn) {
+        // Afficher le bouton paramètres (roue crantée) pour le créateur
+        const settingsBtn = document.getElementById('host-settings-btn');
+        if (settingsBtn) {
             if (this.isHost) {
-                pauseBtn.style.display = 'inline-block';
-                pauseBtn.onclick = async () => {
-                    const confirmed = await showConfirmPopup({
-                        icon: '⏸️',
-                        title: 'Mettre en pause',
-                        message: 'Voulez-vous mettre la partie en pause ?',
-                        cancelText: 'Annuler',
-                        confirmText: 'Mettre en pause',
-                        confirmClass: 'btn-primary'
-                    });
-
-                    if (confirmed) {
-                        this.send(MESSAGE_TYPES.FORCE_PAUSE, {
-                            playerId: this.playerId,
-                            roomId: this.roomId
-                        });
-                    }
-                };
+                settingsBtn.style.display = 'flex';
+                settingsBtn.onclick = () => this.openGameSettingsPopup();
             } else {
-                pauseBtn.style.display = 'none';
+                settingsBtn.style.display = 'none';
             }
         }
 
-        // Afficher le bouton arrêter pour le créateur
-        const stopBtn = document.getElementById('host-stop-btn');
-        if (stopBtn) {
-            if (this.isHost) {
-                stopBtn.style.display = 'inline-block';
-                stopBtn.onclick = async () => {
-                    const confirmed = await showConfirmPopup({
-                        icon: '🛑',
-                        title: 'Arrêter la partie',
-                        message: 'Voulez-vous arrêter la partie ? Tous les joueurs retourneront au lobby.',
-                        cancelText: 'Annuler',
-                        confirmText: 'Arrêter la partie',
-                        confirmClass: 'btn-danger'
-                    });
+        // Initialiser les boutons de la popup paramètres
+        this.initGameSettingsPopup();
+    }
 
-                    if (confirmed) {
-                        this.send(MESSAGE_TYPES.STOP_GAME, {
-                            playerId: this.playerId,
-                            roomId: this.roomId
-                        });
-                    }
-                };
-            } else {
-                stopBtn.style.display = 'none';
-            }
+    openGameSettingsPopup() {
+        const popup = document.getElementById('game-settings-popup');
+        if (popup) {
+            popup.style.display = 'flex';
+        }
+    }
+
+    closeGameSettingsPopup() {
+        const popup = document.getElementById('game-settings-popup');
+        if (popup) {
+            popup.style.display = 'none';
+        }
+    }
+
+    initGameSettingsPopup() {
+        const closeBtn = document.getElementById('close-settings-popup');
+        const pauseBtn = document.getElementById('settings-pause-btn');
+        const stopBtn = document.getElementById('settings-stop-btn');
+        const overlay = document.getElementById('game-settings-popup');
+
+        if (closeBtn) {
+            closeBtn.onclick = () => this.closeGameSettingsPopup();
+        }
+
+        // Fermer en cliquant sur l'overlay
+        if (overlay) {
+            overlay.onclick = (e) => {
+                if (e.target === overlay) {
+                    this.closeGameSettingsPopup();
+                }
+            };
+        }
+
+        if (pauseBtn) {
+            pauseBtn.onclick = async () => {
+                this.closeGameSettingsPopup();
+                const confirmed = await showConfirmPopup({
+                    icon: '⏸️',
+                    title: 'Mettre en pause',
+                    message: 'Voulez-vous mettre la partie en pause ?',
+                    cancelText: 'Annuler',
+                    confirmText: 'Mettre en pause',
+                    confirmClass: 'btn-primary'
+                });
+
+                if (confirmed) {
+                    this.send(MESSAGE_TYPES.FORCE_PAUSE, {
+                        playerId: this.playerId,
+                        roomId: this.roomId
+                    });
+                }
+            };
+        }
+
+        if (stopBtn) {
+            stopBtn.onclick = async () => {
+                this.closeGameSettingsPopup();
+                const confirmed = await showConfirmPopup({
+                    icon: '🛑',
+                    title: 'Arrêter la partie',
+                    message: 'Voulez-vous arrêter la partie ? Tous les joueurs retourneront au lobby.',
+                    cancelText: 'Annuler',
+                    confirmText: 'Arrêter la partie',
+                    confirmClass: 'btn-danger'
+                });
+
+                if (confirmed) {
+                    this.send(MESSAGE_TYPES.STOP_GAME, {
+                        playerId: this.playerId,
+                        roomId: this.roomId
+                    });
+                }
+            };
         }
     }
 

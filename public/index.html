@@ -267,8 +267,7 @@
                     <span>Impasse : </span>
                     <span id="deadlock-count">0</span>/3
                 </div>
-                <button id="host-pause-btn" class="btn btn-small btn-secondary" style="display: none;">⏸️ Pause</button>
-                <button id="host-stop-btn" class="btn btn-small btn-danger" style="display: none;">🛑 Arrêter</button>
+                <button id="host-settings-btn" class="btn-icon-settings" style="display: none;" title="Paramètres de la partie">⚙️</button>
             </div>
         </div>
 
@@ -711,6 +710,24 @@
         <div class="confirm-popup-buttons">
             <button id="confirm-popup-cancel" class="btn btn-secondary">Annuler</button>
             <button id="confirm-popup-confirm" class="btn btn-danger">Confirmer</button>
+        </div>
+    </div>
+</div>
+
+<!-- Popup paramètres de la partie -->
+<div id="game-settings-popup" class="settings-popup-overlay" style="display: none;">
+    <div class="settings-popup">
+        <div class="settings-popup-header">
+            <h3>⚙️ Paramètres de la partie</h3>
+            <button id="close-settings-popup" class="btn-close-settings">&times;</button>
+        </div>
+        <div class="settings-popup-content">
+            <button id="settings-pause-btn" class="btn btn-secondary btn-full">
+                <span class="btn-icon-left">⏸️</span> Mettre en pause
+            </button>
+            <button id="settings-stop-btn" class="btn btn-danger btn-full">
+                <span class="btn-icon-left">🛑</span> Arrêter la partie
+            </button>
         </div>
     </div>
 </div>

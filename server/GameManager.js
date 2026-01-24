@@ -14,7 +14,7 @@ class GameManager {
     /**
      * Créer une nouvelle partie
      */
-    createGame(roomId, hostName, hostId, isPublic = true, password = null) {
+     createGame(roomId, hostName, hostId, isPublic = true, password = null) {
         const game = new Game(roomId);
         this.games.set(roomId, game);
 

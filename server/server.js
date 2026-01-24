@@ -13,6 +13,32 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
+// Heartbeat côté serveur pour maintenir les connexions actives
+const HEARTBEAT_INTERVAL = 30000; // 30 secondes
+
+function heartbeat() {
+    this.isAlive = true;
+}
+
+// Vérifier les connexions mortes toutes les 30 secondes
+const heartbeatChecker = setInterval(() => {
+    wss.clients.forEach((ws) => {
+        if (ws.isAlive === false) {
+            console.log('💀 Connexion morte détectée, fermeture...');
+            return ws.terminate();
+        }
+        ws.isAlive = false;
+        // Envoyer un ping WebSocket natif
+        if (ws.readyState === WebSocket.OPEN) {
+            ws.ping();
+        }
+    });
+}, HEARTBEAT_INTERVAL);
+
+wss.on('close', () => {
+    clearInterval(heartbeatChecker);
+});
+
 // Initialiser la base de données au démarrage
 initDatabase().catch(err => {
     console.error('Impossible d\'initialiser la base de données:', err);
@@ -102,6 +128,10 @@ function sendPlayerList(roomId) {
 wss.on('connection', (ws) => {
     let playerId = null;
     let roomId = null;
+
+    // Configurer le heartbeat pour cette connexion
+    ws.isAlive = true;
+    ws.on('pong', heartbeat);
 
     console.log('Nouvelle connexion WebSocket');
 
