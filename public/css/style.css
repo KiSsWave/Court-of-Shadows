@@ -118,7 +118,10 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
     position: relative;
-    background: var(--bg-primary);
+    background:
+        radial-gradient(ellipse at 20% 30%, rgba(220, 38, 38, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(37, 99, 235, 0.15) 0%, transparent 50%),
+        var(--bg-primary);
 }
 
 /* ========================================
@@ -170,11 +173,12 @@ body {
 .title {
     font-size: clamp(2.5rem, 6vw, 5rem);
     text-align: center;
-    color: var(--text-primary);
+    color: var(--gold);
     margin-bottom: 15px;
     font-weight: 700;
     letter-spacing: 4px;
     text-transform: uppercase;
+    text-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
 }
 
 .subtitle {
@@ -565,6 +569,26 @@ input[type="password"]::placeholder {
 .btn-secondary:hover {
     background: var(--surface-hover);
     border-color: var(--primary);
+}
+
+/* Bouton retour */
+.btn-back {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    z-index: 100;
+}
+
+@media (max-width: 768px) {
+    .btn-back {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        padding: 8px 16px;
+        font-size: 0.85rem;
+    }
 }
 
 /* Bouton danger */
@@ -1219,6 +1243,15 @@ input[type="password"]::placeholder {
     text-transform: uppercase;
     letter-spacing: 1px;
     text-align: center;
+}
+
+/* Masquer les boutons toggle sur desktop */
+.section-toggle {
+    display: none;
+}
+
+.section-content {
+    display: block;
 }
 
 #game-players-list {
@@ -2103,7 +2136,7 @@ input[type="password"]::placeholder {
     /* Game main mobile */
     .game-main {
         grid-template-columns: 1fr;
-        gap: 15px;
+        gap: 10px;
         min-height: auto;
     }
 
@@ -2111,73 +2144,197 @@ input[type="password"]::placeholder {
         order: -1;
     }
 
+    /* Sections pliables mobile */
     .game-players,
     .game-chat {
-        padding: 15px;
+        padding: 0;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+    }
+
+    .game-players.collapsed .section-content,
+    .game-chat.collapsed .section-content {
+        display: none;
+    }
+
+    .section-toggle {
+        display: flex;
+        width: 100%;
+        padding: 12px 16px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        color: var(--primary-light);
+        font-family: 'Cinzel', serif;
+        font-size: 0.95rem;
+        font-weight: 700;
+        cursor: pointer;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+
+    .section-toggle:hover {
+        background: var(--surface-hover);
+    }
+
+    .section-toggle .toggle-icon {
+        transition: transform var(--transition-base);
+    }
+
+    .collapsed .section-toggle .toggle-icon {
+        transform: rotate(-90deg);
+    }
+
+    .section-content {
+        background: var(--bg-secondary);
+        border-radius: var(--radius-md);
+        padding: 12px;
+        border: 1px solid var(--border);
     }
 
     .game-players h3,
     .game-chat h3 {
-        font-size: 1.1rem;
-        margin-bottom: 15px;
+        display: none;
     }
 
-    /* Game header mobile */
+    #game-players-list {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    #chat-messages {
+        height: 180px;
+        min-height: 180px;
+    }
+
+    /* Game header mobile - ultra compact */
     .game-header {
-        padding: 15px;
-        gap: 15px;
+        padding: 8px;
+        gap: 8px;
+        grid-template-columns: 1fr;
     }
 
     .score-board {
-        flex-direction: column;
-        gap: 15px;
+        flex-direction: row;
+        gap: 8px;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
     }
 
     .deck-info {
-        justify-content: center;
+        display: none; /* Masquer pioche/défausse sur mobile */
     }
 
     .scores-container {
         flex-direction: row;
         justify-content: center;
-        gap: 20px;
+        gap: 10px;
     }
 
     .score-item {
-        padding: 10px 15px;
-        font-size: 0.9rem;
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        min-width: 100px;
+    }
+
+    .score-item .label {
+        font-size: 0.65rem;
+        margin-bottom: 2px;
+    }
+
+    .score-item .count {
+        font-size: 1.4rem;
     }
 
     .phase-indicator {
-        font-size: 1rem;
-        padding: 10px 15px;
+        font-size: 0.85rem;
+        padding: 8px 12px;
+        order: -1;
     }
 
     .header-right {
-        flex-direction: column;
-        gap: 10px;
+        flex-direction: row;
+        gap: 6px;
         align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
     }
 
-    .player-info-display,
-    .player-role-display,
+    .player-info-display {
+        padding: 4px 10px;
+    }
+
+    .player-info-display .player-name-label {
+        font-size: 0.8rem;
+    }
+
+    .player-role-display {
+        padding: 4px 8px;
+    }
+
+    .player-role-display .role-label {
+        display: none;
+    }
+
+    .player-role-display .role-value {
+        font-size: 0.75rem;
+        padding: 3px 8px;
+    }
+
     .deadlock-counter {
-        font-size: 0.85rem;
+        font-size: 0.75rem;
+        padding: 4px 8px;
     }
 
-    /* Progression boards mobile */
+    .btn-icon-settings {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+    }
+
+    /* Progression boards mobile - 2 colonnes */
     .progression-boards-container {
-        grid-template-columns: 1fr;
-        gap: 15px;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin: 6px 0;
     }
 
     .progression-board {
-        padding: 15px 10px;
+        padding: 8px 5px;
+        min-height: 85px;
+    }
+
+    .progression-board.conspirators::before,
+    .progression-board.loyalists::before {
+        font-size: 0.7rem;
+        top: 4px;
+        letter-spacing: 1px;
     }
 
     .progress-markers {
-        gap: 5px;
-        justify-content: center;
+        padding: 28px 5px 8px;
+        gap: 3px;
+    }
+
+    .progress-markers.edits {
+        padding: 28px 8px 8px;
+    }
+
+    .progress-marker {
+        width: 32px;
+        height: 44px;
+    }
+
+    .progress-marker .marker-card {
+        width: 22px;
+        height: 30px;
+    }
+
+    .progress-marker .power-icon {
+        font-size: 0.45rem;
     }
 
     /* User info mobile */

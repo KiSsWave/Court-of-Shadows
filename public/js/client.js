@@ -284,6 +284,9 @@ class CourtOfShadowsClient {
         // Cartes reçues (pour partage dans le chat)
         this.lastReceivedCards = null; // { role: 'king'|'chancellor', cards: [...] }
 
+        // Paramètre pour afficher les popups d'action (sauvegardé en localStorage)
+        this.showActionLogs = localStorage.getItem('showActionLogs') !== 'false';
+
         this.selectedGameType = 'public';
 
 
@@ -1064,6 +1067,24 @@ class CourtOfShadowsClient {
             });
         }
 
+        // Sections pliables (mobile)
+        const togglePlayers = document.getElementById('toggle-players');
+        const toggleChat = document.getElementById('toggle-chat');
+
+        if (togglePlayers) {
+            togglePlayers.addEventListener('click', () => {
+                const section = document.getElementById('players-section');
+                section.classList.toggle('collapsed');
+            });
+        }
+
+        if (toggleChat) {
+            toggleChat.addEventListener('click', () => {
+                const section = document.getElementById('chat-section');
+                section.classList.toggle('collapsed');
+            });
+        }
+
         // Game over
         const newGameBtn = document.getElementById('new-game-btn');
         const returnLobbyBtn = document.getElementById('return-lobby-btn');
@@ -1135,6 +1156,14 @@ class CourtOfShadowsClient {
         const closeRulesBtn = document.getElementById('close-rules-btn');
         if (closeRulesBtn) {
             closeRulesBtn.addEventListener('click', () => {
+                this.showScreen('lobby-screen');
+            });
+        }
+
+        // Bouton retour en haut de la page des règles
+        const backFromRulesBtn = document.getElementById('back-from-rules-btn');
+        if (backFromRulesBtn) {
+            backFromRulesBtn.addEventListener('click', () => {
                 this.showScreen('lobby-screen');
             });
         }       
@@ -1415,6 +1444,13 @@ class CourtOfShadowsClient {
             nameElement.textContent = this.playerName;
         }
 
+        // Bouton toggle popups d'action
+        const actionLogsBtn = document.getElementById('toggle-action-logs-btn');
+        if (actionLogsBtn) {
+            actionLogsBtn.onclick = () => this.toggleActionLogs();
+            this.updateActionLogsButton();
+        }
+
         // Bouton règles (visible par tous)
         const rulesBtn = document.getElementById('game-rules-btn');
         if (rulesBtn) {
@@ -1434,6 +1470,14 @@ class CourtOfShadowsClient {
 
         // Initialiser les boutons de la popup paramètres
         this.initGameSettingsPopup();
+
+        // Sur mobile, plier la section joueurs par défaut
+        if (window.innerWidth <= 768) {
+            const playersSection = document.getElementById('players-section');
+            if (playersSection && !playersSection.classList.contains('collapsed')) {
+                playersSection.classList.add('collapsed');
+            }
+        }
     }
 
     showRulesPopup() {
@@ -2198,15 +2242,35 @@ class CourtOfShadowsClient {
             soundManager.playEditPassed();
         }
 
-        // Afficher popup d'action avec détails
-        this.showActionLogPopup({
-            icon: decreeIcon,
-            title: `${decreeType} adopté !`,
-            color: decreeColor,
-            kingName: data.kingName,
-            chancellorName: data.chancellorName,
-            isDeadlock: data.isDeadlock
-        });
+        // Afficher popup d'action uniquement si activé
+        if (this.showActionLogs) {
+            this.showActionLogPopup({
+                icon: decreeIcon,
+                title: `${decreeType} adopté !`,
+                color: decreeColor,
+                kingName: data.kingName,
+                chancellorName: data.chancellorName,
+                isDeadlock: data.isDeadlock
+            });
+        } else {
+            // Notification simple si popups désactivées
+            this.showNotification(`📜 ${decreeType} ${decreeIcon} adopté !`);
+        }
+    }
+
+    toggleActionLogs() {
+        this.showActionLogs = !this.showActionLogs;
+        localStorage.setItem('showActionLogs', this.showActionLogs);
+        this.updateActionLogsButton();
+        this.showNotification(this.showActionLogs ? '📋 Popups d\'action activées' : '📋 Popups d\'action désactivées');
+    }
+
+    updateActionLogsButton() {
+        const btn = document.getElementById('toggle-action-logs-btn');
+        if (btn) {
+            btn.style.opacity = this.showActionLogs ? '1' : '0.5';
+            btn.title = this.showActionLogs ? 'Désactiver les popups d\'action' : 'Activer les popups d\'action';
+        }
     }
 
     showActionLogPopup(action) {
