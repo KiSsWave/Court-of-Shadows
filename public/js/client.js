@@ -634,6 +634,9 @@ class CourtOfShadowsClient {
             this.reconnectAttempts = 0;
             this.isReconnecting = false;
 
+            // Cacher l'indicateur de connexion perdue
+            this.showConnectionStatus(false);
+
             // Envoyer un ping toutes les 15 secondes pour maintenir la connexion
             this.pingInterval = setInterval(() => {
                 if (this.ws && this.ws.readyState === WebSocket.OPEN) {
@@ -676,6 +679,9 @@ class CourtOfShadowsClient {
                 this.wasAuthenticated = true;
             }
 
+            // Afficher l'indicateur de connexion perdue
+            this.showConnectionStatus(true);
+
             // Reconnexion automatique silencieuse
             this.autoReconnect();
         };
@@ -684,18 +690,82 @@ class CourtOfShadowsClient {
     autoReconnect() {
         if (this.isReconnecting) return;
 
+        const MAX_RECONNECT_ATTEMPTS = 20;
+
         this.isReconnecting = true;
         this.reconnectAttempts = (this.reconnectAttempts || 0) + 1;
+
+        // Vérifier si on a dépassé le nombre max de tentatives
+        if (this.reconnectAttempts > MAX_RECONNECT_ATTEMPTS) {
+            console.log('❌ Nombre maximum de tentatives de reconnexion atteint');
+            this.updateConnectionStatus(`Connexion perdue. <button onclick="window.location.reload()" style="margin-left: 10px; padding: 5px 15px; cursor: pointer; background: var(--primary); color: white; border: none; border-radius: 4px;">Recharger la page</button>`);
+            this.isReconnecting = false;
+            return;
+        }
 
         // Délai exponentiel avec maximum de 10 secondes
         const delay = Math.min(1000 * Math.pow(1.5, this.reconnectAttempts - 1), 10000);
 
-        console.log(`🔄 Reconnexion automatique dans ${Math.round(delay/1000)}s (tentative ${this.reconnectAttempts})...`);
+        console.log(`🔄 Reconnexion automatique dans ${Math.round(delay/1000)}s (tentative ${this.reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})...`);
+        this.updateConnectionStatus(`Reconnexion... (${this.reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`);
 
         setTimeout(() => {
             this.isReconnecting = false;
             this.connect();
         }, delay);
+    }
+
+    showConnectionStatus(show) {
+        let overlay = document.getElementById('connection-status-overlay');
+
+        if (show) {
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'connection-status-overlay';
+                overlay.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    background: rgba(239, 68, 68, 0.95);
+                    color: white;
+                    padding: 12px 20px;
+                    text-align: center;
+                    z-index: 10000;
+                    font-weight: 500;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 10px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                `;
+                overlay.innerHTML = `
+                    <span class="connection-spinner" style="
+                        width: 16px;
+                        height: 16px;
+                        border: 2px solid rgba(255,255,255,0.3);
+                        border-top-color: white;
+                        border-radius: 50%;
+                        animation: spin 1s linear infinite;
+                    "></span>
+                    <span class="connection-message">Connexion perdue... Reconnexion en cours</span>
+                `;
+                document.body.prepend(overlay);
+            }
+            overlay.style.display = 'flex';
+        } else if (overlay) {
+            overlay.style.display = 'none';
+        }
+    }
+
+    updateConnectionStatus(message) {
+        const overlay = document.getElementById('connection-status-overlay');
+        if (overlay) {
+            const messageSpan = overlay.querySelector('.connection-message');
+            if (messageSpan) {
+                messageSpan.innerHTML = message;
+            }
+        }
     }
 
     send(type, data = {}) {
@@ -1345,6 +1415,12 @@ class CourtOfShadowsClient {
             nameElement.textContent = this.playerName;
         }
 
+        // Bouton règles (visible par tous)
+        const rulesBtn = document.getElementById('game-rules-btn');
+        if (rulesBtn) {
+            rulesBtn.onclick = () => this.showRulesPopup();
+        }
+
         // Afficher le bouton paramètres (roue crantée) pour le créateur
         const settingsBtn = document.getElementById('host-settings-btn');
         if (settingsBtn) {
@@ -1358,6 +1434,87 @@ class CourtOfShadowsClient {
 
         // Initialiser les boutons de la popup paramètres
         this.initGameSettingsPopup();
+    }
+
+    showRulesPopup() {
+        // Créer une popup avec les règles résumées
+        const existing = document.getElementById('rules-popup-overlay');
+        if (existing) existing.remove();
+
+        const overlay = document.createElement('div');
+        overlay.id = 'rules-popup-overlay';
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 9998;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        `;
+
+        overlay.innerHTML = `
+            <div style="
+                background: var(--bg-secondary);
+                border-radius: var(--radius-lg);
+                padding: 24px;
+                max-width: 600px;
+                max-height: 80vh;
+                overflow-y: auto;
+                border: 1px solid var(--border);
+                box-shadow: var(--shadow-lg);
+            ">
+                <h2 style="color: var(--primary-light); margin: 0 0 16px 0; text-align: center;">📖 Règles Rapides</h2>
+
+                <div style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6;">
+                    <h3 style="color: var(--loyalist-blue); margin: 16px 0 8px;">⚜️ Loyalistes (bleu)</h3>
+                    <p>Adopter <strong>5 Édits Royaux</strong> OU identifier et exécuter l'Usurpateur.</p>
+
+                    <h3 style="color: var(--conspirator-red); margin: 16px 0 8px;">🗡️ Conspirateurs (rouge)</h3>
+                    <p>Adopter <strong>6 Complots</strong> OU faire élire l'Usurpateur Chancelier après 3 Complots.</p>
+
+                    <h3 style="color: var(--primary-light); margin: 16px 0 8px;">👑 Tour de jeu</h3>
+                    <ol style="margin: 0; padding-left: 20px;">
+                        <li><strong>Nomination</strong> : Le Roi nomme un Chancelier</li>
+                        <li><strong>Vote</strong> : Tous votent OUI ou NON</li>
+                        <li><strong>Session Législative</strong> : Roi tire 3 cartes → en défausse 1 → Chancelier choisit parmi les 2 restantes</li>
+                        <li><strong>Pouvoir Exécutif</strong> : Après certains Complots, le Roi peut utiliser un pouvoir</li>
+                    </ol>
+
+                    <h3 style="color: var(--warning); margin: 16px 0 8px;">⚡ Pouvoirs</h3>
+                    <ul style="margin: 0; padding-left: 20px;">
+                        <li>👁️ <strong>Inspection</strong> : Voir les 3 prochaines cartes</li>
+                        <li>🔍 <strong>Enquête</strong> : Voir la faction d'un joueur</li>
+                        <li>👑 <strong>Succession</strong> : Choisir le prochain Roi</li>
+                        <li>💀 <strong>Exécution</strong> : Éliminer un joueur</li>
+                    </ul>
+                </div>
+
+                <button id="close-rules-popup" style="
+                    margin-top: 20px;
+                    width: 100%;
+                    padding: 12px;
+                    background: var(--primary);
+                    color: white;
+                    border: none;
+                    border-radius: var(--radius-md);
+                    cursor: pointer;
+                    font-weight: 700;
+                    font-size: 1rem;
+                ">Fermer</button>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+
+        document.getElementById('close-rules-popup').onclick = () => overlay.remove();
+        overlay.onclick = (e) => {
+            if (e.target === overlay) overlay.remove();
+        };
     }
 
     openGameSettingsPopup() {
@@ -2029,15 +2186,96 @@ class CourtOfShadowsClient {
 
     // === AUTRES MÉTHODES ===
     handleDecreePassed(data) {
-        const decreeType = data.decree === DECREE_TYPES.PLOT ? 'Complot 🗡️' : 'Édit Royal ⚜️';
-        this.showNotification(`📜 Un ${decreeType} a été adopté !`);
+        const isPlot = data.decree === DECREE_TYPES.PLOT;
+        const decreeType = isPlot ? 'Complot' : 'Édit Royal';
+        const decreeIcon = isPlot ? '🗡️' : '⚜️';
+        const decreeColor = isPlot ? 'var(--conspirator-red)' : 'var(--loyalist-blue)';
 
         // Jouer le son approprié selon le type de décret
-        if (data.decree === DECREE_TYPES.PLOT) {
+        if (isPlot) {
             soundManager.playPlotPassed();
         } else {
             soundManager.playEditPassed();
         }
+
+        // Afficher popup d'action avec détails
+        this.showActionLogPopup({
+            icon: decreeIcon,
+            title: `${decreeType} adopté !`,
+            color: decreeColor,
+            kingName: data.kingName,
+            chancellorName: data.chancellorName,
+            isDeadlock: data.isDeadlock
+        });
+    }
+
+    showActionLogPopup(action) {
+        // Supprimer popup existante si présente
+        const existing = document.getElementById('action-log-popup');
+        if (existing) existing.remove();
+
+        const popup = document.createElement('div');
+        popup.id = 'action-log-popup';
+        popup.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: var(--bg-secondary);
+            border: 2px solid ${action.color};
+            border-radius: var(--radius-lg);
+            padding: 24px 32px;
+            z-index: 9999;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            animation: popupScale 0.25s ease forwards;
+            min-width: 280px;
+        `;
+
+        let content = `
+            <div style="font-size: 3rem; margin-bottom: 12px;">${action.icon}</div>
+            <h3 style="color: ${action.color}; margin: 0 0 16px 0; font-size: 1.3rem;">${action.title}</h3>
+        `;
+
+        if (action.isDeadlock) {
+            content += `
+                <p style="color: #f59e0b; font-size: 0.95rem; margin: 0;">
+                    ⚠️ Impasse : carte adoptée automatiquement
+                </p>
+            `;
+        } else if (action.kingName && action.chancellorName) {
+            content += `
+                <div style="display: flex; flex-direction: column; gap: 8px; color: var(--text-secondary); font-size: 0.95rem;">
+                    <div>👑 Roi : <strong style="color: var(--text-primary)">${action.kingName}</strong></div>
+                    <div>📜 Chancelier : <strong style="color: var(--text-primary)">${action.chancellorName}</strong></div>
+                </div>
+            `;
+        }
+
+        popup.innerHTML = content;
+
+        // Ajouter style animation si pas déjà présent
+        if (!document.getElementById('popup-scale-style')) {
+            const style = document.createElement('style');
+            style.id = 'popup-scale-style';
+            style.textContent = `
+                @keyframes popupScale {
+                    from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+                    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        document.body.appendChild(popup);
+
+        // Auto-fermeture après 3s
+        setTimeout(() => {
+            popup.style.transition = 'opacity 0.2s, transform 0.2s';
+            popup.style.opacity = '0';
+            popup.style.transform = 'translate(-50%, -50%) scale(0.95)';
+            setTimeout(() => popup.remove(), 200);
+        }, 3000);
     }
 
     showDebateUI() {

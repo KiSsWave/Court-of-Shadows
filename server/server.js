@@ -14,23 +14,38 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 // Heartbeat côté serveur pour maintenir les connexions actives
-const HEARTBEAT_INTERVAL = 30000; // 30 secondes
+// Augmenté à 45s pour tolérer les onglets inactifs (navigateurs throttle les timers)
+const HEARTBEAT_INTERVAL = 45000; // 45 secondes
+const MAX_MISSED_PINGS = 2; // Nombre de pings manqués avant déconnexion
 
 function heartbeat() {
     this.isAlive = true;
+    this.missedPings = 0;
 }
 
-// Vérifier les connexions mortes toutes les 30 secondes
+// Vérifier les connexions mortes
 const heartbeatChecker = setInterval(() => {
     wss.clients.forEach((ws) => {
         if (ws.isAlive === false) {
-            console.log('💀 Connexion morte détectée, fermeture...');
-            return ws.terminate();
+            ws.missedPings = (ws.missedPings || 0) + 1;
+
+            // Déconnecter seulement après MAX_MISSED_PINGS pings manqués
+            if (ws.missedPings >= MAX_MISSED_PINGS) {
+                console.log(`💀 Connexion morte détectée (${ws.missedPings} pings manqués), fermeture...`);
+                return ws.terminate();
+            }
+        } else {
+            ws.missedPings = 0;
         }
+
         ws.isAlive = false;
         // Envoyer un ping WebSocket natif
         if (ws.readyState === WebSocket.OPEN) {
-            ws.ping();
+            try {
+                ws.ping();
+            } catch (error) {
+                console.error('Erreur ping:', error.message);
+            }
         }
     });
 }, HEARTBEAT_INTERVAL);
@@ -57,20 +72,32 @@ function generateId() {
     return Math.random().toString(36).substring(2, 9);
 }
 
-// Envoyer un message à un joueur spécifique
+// Envoyer un message à un joueur spécifique (avec gestion d'erreur)
 function sendToPlayer(playerId, message) {
     const connection = playerConnections.get(playerId);
     if (connection && connection.ws.readyState === WebSocket.OPEN) {
-        connection.ws.send(JSON.stringify(message));
+        try {
+            connection.ws.send(JSON.stringify(message));
+        } catch (error) {
+            console.error(`Erreur envoi à ${playerId}:`, error.message);
+            // Marquer la connexion comme morte pour le prochain heartbeat
+            connection.ws.isAlive = false;
+        }
     }
 }
 
-// Envoyer un message à tous les joueurs d'une partie
+// Envoyer un message à tous les joueurs d'une partie (avec gestion d'erreur)
 function broadcastToGame(roomId, message, excludePlayerId = null) {
+    const messageStr = JSON.stringify(message);
     for (const [playerId, connection] of playerConnections.entries()) {
         if (connection.roomId === roomId && playerId !== excludePlayerId) {
             if (connection.ws.readyState === WebSocket.OPEN) {
-                connection.ws.send(JSON.stringify(message));
+                try {
+                    connection.ws.send(messageStr);
+                } catch (error) {
+                    console.error(`Erreur broadcast à ${playerId}:`, error.message);
+                    connection.ws.isAlive = false;
+                }
             }
         }
     }
@@ -702,6 +729,10 @@ wss.on('connection', (ws) => {
                 data: { decrees: remaining }
             });
         } else {
+            // Récupérer les noms avant de passer le décret
+            const kingPlayer = game.players.get(game.currentKingId);
+            const chancellorPlayer = game.players.get(game.currentChancellorId);
+
             const passedDecree = game.chancellorDiscardDecree(playerId, discardedIndex);
 
             broadcastToGame(roomId, {
@@ -709,7 +740,9 @@ wss.on('connection', (ws) => {
                 data: {
                     decree: passedDecree,
                     plotsCount: game.plotsCount,
-                    editsCount: game.editsCount
+                    editsCount: game.editsCount,
+                    kingName: kingPlayer?.name || 'Roi',
+                    chancellorName: chancellorPlayer?.name || 'Chancelier'
                 }
             });
 
@@ -1015,7 +1048,7 @@ wss.on('connection', (ws) => {
     function handleReconnect(ws, data) {
         const { playerName } = data;
 
-        // Chercher dans le GameManager
+        // Chercher dans le GameManager (playerName = username côté client)
         const playerGame = gameManager.findPlayerGame(playerName);
 
         if (!playerGame) {
@@ -1028,36 +1061,62 @@ wss.on('connection', (ws) => {
 
         const { roomId: foundRoomId, game: foundGame } = playerGame;
 
+        // Vérifier que le joueur peut se reconnecter à cette partie
+        if (!foundGame.canReconnect(playerName)) {
+            ws.send(JSON.stringify({
+                type: MESSAGE_TYPES.ERROR,
+                message: 'Impossible de se reconnecter à cette partie'
+            }));
+            return;
+        }
+
         // Générer un nouvel ID
         playerId = generateId();
         roomId = foundRoomId;
 
+        // IMPORTANT: Récupérer l'username AVANT la reconnexion
+        // car reconnectPlayer supprime l'entrée de disconnectedPlayers
+        const oldPlayerId = foundGame.disconnectedPlayers.get(playerName)?.odPlayerId;
+        const oldConnection = oldPlayerId ? playerConnections.get(oldPlayerId) : null;
+        const username = oldConnection?.username || playerName;
+
         const reconnectResult = foundGame.reconnectPlayer(playerName, playerId, ws);
 
         if (reconnectResult) {
-            const connection = playerConnections.get(reconnectResult.oldPlayerId);
-            const username = connection ? connection.username : null;
+            // Supprimer l'ancienne connexion pour éviter les doublons
+            if (reconnectResult.oldPlayerId) {
+                playerConnections.delete(reconnectResult.oldPlayerId);
+            }
 
+            // Enregistrer la nouvelle connexion
             playerConnections.set(playerId, { ws, roomId: foundRoomId, playerName, username });
 
-            ws.send(JSON.stringify({
-                type: MESSAGE_TYPES.JOIN_GAME,
-                success: true,
-                data: {
-                    playerId,
-                    roomId: foundRoomId,
-                    isHost: reconnectResult.playerData.isHost,
-                    reconnected: true
-                }
-            }));
+            // Configurer le heartbeat pour la nouvelle connexion
+            ws.isAlive = true;
 
-            ws.send(JSON.stringify({
-                type: MESSAGE_TYPES.ROLE_ASSIGNMENT,
-                data: {
-                    role: reconnectResult.playerData.role,
-                    faction: reconnectResult.playerData.faction
-                }
-            }));
+            try {
+                ws.send(JSON.stringify({
+                    type: MESSAGE_TYPES.JOIN_GAME,
+                    success: true,
+                    data: {
+                        playerId,
+                        roomId: foundRoomId,
+                        isHost: reconnectResult.playerData.isHost,
+                        reconnected: true
+                    }
+                }));
+
+                ws.send(JSON.stringify({
+                    type: MESSAGE_TYPES.ROLE_ASSIGNMENT,
+                    data: {
+                        role: reconnectResult.playerData.role,
+                        faction: reconnectResult.playerData.faction
+                    }
+                }));
+            } catch (error) {
+                console.error(`Erreur envoi reconnexion à ${playerName}:`, error.message);
+                return;
+            }
 
             if (!foundGame.isPaused) {
                 broadcastToGame(foundRoomId, {
@@ -1071,7 +1130,12 @@ wss.on('connection', (ws) => {
 
             gameManager.updateActivity(foundRoomId);
 
-            console.log(`${playerName} a reconnecté à la partie ${foundRoomId}`);
+            console.log(`✅ ${playerName} a reconnecté à la partie ${foundRoomId}`);
+        } else {
+            ws.send(JSON.stringify({
+                type: MESSAGE_TYPES.ERROR,
+                message: 'Erreur lors de la reconnexion'
+            }));
         }
     }
 
