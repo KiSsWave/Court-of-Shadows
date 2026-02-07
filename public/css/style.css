@@ -1744,6 +1744,27 @@ input[type="password"]::placeholder {
     font-size: 0.95rem;
 }
 
+/* Messages système (actions) */
+.chat-message.system-message {
+    background: var(--surface);
+    border-left-color: var(--gold);
+    font-style: italic;
+}
+
+.chat-message.system-message.conspirator {
+    border-left-color: var(--conspirator-red);
+    background: rgba(220, 38, 38, 0.1);
+}
+
+.chat-message.system-message.loyalist {
+    border-left-color: var(--loyalist-blue);
+    background: rgba(37, 99, 235, 0.1);
+}
+
+.chat-message.system-message .chat-author.system {
+    color: var(--gold);
+}
+
 /* Partage des cartes */
 #share-cards-container {
     margin-bottom: 12px;

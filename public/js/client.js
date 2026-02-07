@@ -284,9 +284,6 @@ class CourtOfShadowsClient {
         // Cartes reçues (pour partage dans le chat)
         this.lastReceivedCards = null; // { role: 'king'|'chancellor', cards: [...] }
 
-        // Paramètre pour afficher les popups d'action (sauvegardé en localStorage)
-        this.showActionLogs = localStorage.getItem('showActionLogs') !== 'false';
-
         this.selectedGameType = 'public';
 
 
@@ -409,7 +406,17 @@ class CourtOfShadowsClient {
             this.isAuthenticated = true;
             this.playerName = data.user.username;
             localStorage.setItem('courtOfShadows_user', JSON.stringify(data.user));
-            this.showLobby();
+
+            // Si on était en partie, tenter de se reconnecter à la partie
+            if (this.wasInGame && this.roomId) {
+                console.log('🔄 Tentative de reconnexion à la partie...');
+                this.send(MESSAGE_TYPES.RECONNECT, {
+                    playerName: this.playerName,
+                    roomId: this.roomId
+                });
+            } else {
+                this.showLobby();
+            }
         } else {
             this.showAuthError(data.error);
         }
@@ -680,6 +687,14 @@ class CourtOfShadowsClient {
             // Sauvegarder l'état d'authentification pour la reconnexion
             if (this.isAuthenticated) {
                 this.wasAuthenticated = true;
+            }
+
+            // Sauvegarder si on était en partie (pour reconnexion automatique)
+            const gameScreen = document.getElementById('game-screen');
+            const waitingRoom = document.getElementById('waiting-room');
+            if ((gameScreen && gameScreen.classList.contains('active')) ||
+                (waitingRoom && waitingRoom.classList.contains('active'))) {
+                this.wasInGame = true;
             }
 
             // Afficher l'indicateur de connexion perdue
@@ -1229,6 +1244,7 @@ class CourtOfShadowsClient {
             this.playerId = message.data.playerId;
             this.roomId = message.data.roomId;
             this.isHost = message.data.isHost;
+            this.wasInGame = false; // Reset le flag
 
             // Si reconnexion, aller directement à l'écran de jeu
             if (message.data.reconnected) {
@@ -1237,6 +1253,12 @@ class CourtOfShadowsClient {
                 this.showNotification('Reconnecté à la partie !');
             } else {
                 this.showWaitingRoom();
+            }
+        } else {
+            // Reconnexion échouée, aller au lobby
+            this.wasInGame = false;
+            if (this.isAuthenticated) {
+                this.showLobby();
             }
         }
     }
@@ -1442,13 +1464,6 @@ class CourtOfShadowsClient {
         const nameElement = document.getElementById('game-player-name');
         if (nameElement && this.playerName) {
             nameElement.textContent = this.playerName;
-        }
-
-        // Bouton toggle popups d'action
-        const actionLogsBtn = document.getElementById('toggle-action-logs-btn');
-        if (actionLogsBtn) {
-            actionLogsBtn.onclick = () => this.toggleActionLogs();
-            this.updateActionLogsButton();
         }
 
         // Bouton règles (visible par tous)
@@ -2233,7 +2248,6 @@ class CourtOfShadowsClient {
         const isPlot = data.decree === DECREE_TYPES.PLOT;
         const decreeType = isPlot ? 'Complot' : 'Édit Royal';
         const decreeIcon = isPlot ? '🗡️' : '⚜️';
-        const decreeColor = isPlot ? 'var(--conspirator-red)' : 'var(--loyalist-blue)';
 
         // Jouer le son approprié selon le type de décret
         if (isPlot) {
@@ -2242,104 +2256,38 @@ class CourtOfShadowsClient {
             soundManager.playEditPassed();
         }
 
-        // Afficher popup d'action uniquement si activé
-        if (this.showActionLogs) {
-            this.showActionLogPopup({
-                icon: decreeIcon,
-                title: `${decreeType} adopté !`,
-                color: decreeColor,
-                kingName: data.kingName,
-                chancellorName: data.chancellorName,
-                isDeadlock: data.isDeadlock
-            });
-        } else {
-            // Notification simple si popups désactivées
-            this.showNotification(`📜 ${decreeType} ${decreeIcon} adopté !`);
+        // Notification simple à droite
+        this.showNotification(`📜 ${decreeType} ${decreeIcon} adopté !`);
+
+        // Ajouter le détail dans le chat
+        let actionMessage = `${decreeIcon} ${decreeType} adopté`;
+        if (data.isDeadlock) {
+            actionMessage += ` (Impasse)`;
+        } else if (data.kingName && data.chancellorName) {
+            actionMessage += ` | 👑 ${data.kingName} → 📜 ${data.chancellorName}`;
         }
+        this.addSystemChatMessage(actionMessage, isPlot ? 'conspirator' : 'loyalist');
     }
 
-    toggleActionLogs() {
-        this.showActionLogs = !this.showActionLogs;
-        localStorage.setItem('showActionLogs', this.showActionLogs);
-        this.updateActionLogsButton();
-        this.showNotification(this.showActionLogs ? '📋 Popups d\'action activées' : '📋 Popups d\'action désactivées');
-    }
+    addSystemChatMessage(message, type = 'system') {
+        const container = document.getElementById('chat-messages');
+        if (!container) return;
 
-    updateActionLogsButton() {
-        const btn = document.getElementById('toggle-action-logs-btn');
-        if (btn) {
-            btn.style.opacity = this.showActionLogs ? '1' : '0.5';
-            btn.title = this.showActionLogs ? 'Désactiver les popups d\'action' : 'Activer les popups d\'action';
-        }
-    }
+        const timestamp = new Date();
+        const timeStr = timestamp.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
 
-    showActionLogPopup(action) {
-        // Supprimer popup existante si présente
-        const existing = document.getElementById('action-log-popup');
-        if (existing) existing.remove();
-
-        const popup = document.createElement('div');
-        popup.id = 'action-log-popup';
-        popup.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.9);
-            background: var(--bg-secondary);
-            border: 2px solid ${action.color};
-            border-radius: var(--radius-lg);
-            padding: 24px 32px;
-            z-index: 9999;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            animation: popupScale 0.25s ease forwards;
-            min-width: 280px;
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat-message system-message ${type}`;
+        messageDiv.innerHTML = `
+            <div class="chat-header">
+                <span class="chat-author system">⚔️ Action</span>
+                <span class="chat-time">${timeStr}</span>
+            </div>
+            <div class="chat-text">${message}</div>
         `;
 
-        let content = `
-            <div style="font-size: 3rem; margin-bottom: 12px;">${action.icon}</div>
-            <h3 style="color: ${action.color}; margin: 0 0 16px 0; font-size: 1.3rem;">${action.title}</h3>
-        `;
-
-        if (action.isDeadlock) {
-            content += `
-                <p style="color: #f59e0b; font-size: 0.95rem; margin: 0;">
-                    ⚠️ Impasse : carte adoptée automatiquement
-                </p>
-            `;
-        } else if (action.kingName && action.chancellorName) {
-            content += `
-                <div style="display: flex; flex-direction: column; gap: 8px; color: var(--text-secondary); font-size: 0.95rem;">
-                    <div>👑 Roi : <strong style="color: var(--text-primary)">${action.kingName}</strong></div>
-                    <div>📜 Chancelier : <strong style="color: var(--text-primary)">${action.chancellorName}</strong></div>
-                </div>
-            `;
-        }
-
-        popup.innerHTML = content;
-
-        // Ajouter style animation si pas déjà présent
-        if (!document.getElementById('popup-scale-style')) {
-            const style = document.createElement('style');
-            style.id = 'popup-scale-style';
-            style.textContent = `
-                @keyframes popupScale {
-                    from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
-                    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-                }
-            `;
-            document.head.appendChild(style);
-        }
-
-        document.body.appendChild(popup);
-
-        // Auto-fermeture après 3s
-        setTimeout(() => {
-            popup.style.transition = 'opacity 0.2s, transform 0.2s';
-            popup.style.opacity = '0';
-            popup.style.transform = 'translate(-50%, -50%) scale(0.95)';
-            setTimeout(() => popup.remove(), 200);
-        }, 3000);
+        container.appendChild(messageDiv);
+        container.scrollTop = container.scrollHeight;
     }
 
     showDebateUI() {

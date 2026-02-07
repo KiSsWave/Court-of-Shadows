@@ -1053,7 +1053,8 @@ wss.on('connection', (ws) => {
 
         if (!playerGame) {
             ws.send(JSON.stringify({
-                type: MESSAGE_TYPES.ERROR,
+                type: MESSAGE_TYPES.JOIN_GAME,
+                success: false,
                 message: 'Aucune partie en pause trouvée pour ce joueur'
             }));
             return;
@@ -1064,7 +1065,8 @@ wss.on('connection', (ws) => {
         // Vérifier que le joueur peut se reconnecter à cette partie
         if (!foundGame.canReconnect(playerName)) {
             ws.send(JSON.stringify({
-                type: MESSAGE_TYPES.ERROR,
+                type: MESSAGE_TYPES.JOIN_GAME,
+                success: false,
                 message: 'Impossible de se reconnecter à cette partie'
             }));
             return;
