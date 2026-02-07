@@ -286,7 +286,9 @@ class CourtOfShadowsClient {
 
         this.selectedGameType = 'public';
 
-
+        // Qualité de connexion
+        this.latencies = [];
+        this.lastPingTime = null;
 
         this.init();
     }
@@ -294,9 +296,82 @@ class CourtOfShadowsClient {
     init() {
         this.setupAuthListeners();
         this.setupEventListeners();
+        this.setupConnectionMonitoring(); // Visibility API + Network detection
         this.checkStoredAuth();
         this.connect(); // Se connecter au serveur dès le début
         soundManager.init(); // Initialiser le gestionnaire de sons
+    }
+
+    // === MONITORING DE CONNEXION ===
+    setupConnectionMonitoring() {
+        // Visibility API - Reconnexion quand l'onglet redevient visible
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                console.log('👁️ Onglet visible, vérification connexion...');
+                if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+                    console.log('🔄 Connexion perdue, reconnexion...');
+                    this.reconnectAttempts = 0; // Reset pour reconnexion immédiate
+                    this.isReconnecting = false;
+                    this.connect();
+                } else {
+                    // Forcer un ping pour vérifier que la connexion est vraiment active
+                    try {
+                        this.ws.send(JSON.stringify({ type: 'ping' }));
+                    } catch (e) {
+                        console.log('🔄 Ping échoué, reconnexion...');
+                        this.connect();
+                    }
+                }
+            }
+        });
+
+        // Détection changement réseau
+        window.addEventListener('online', () => {
+            console.log('🌐 Réseau restauré');
+            if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+                this.reconnectAttempts = 0;
+                this.isReconnecting = false;
+                this.connect();
+            }
+        });
+
+        window.addEventListener('offline', () => {
+            console.log('📴 Réseau perdu');
+            this.showConnectionStatus(true);
+            this.updateConnectionStatus('Connexion réseau perdue...');
+        });
+    }
+
+    // Enregistrer une mesure de latence et mettre à jour l'indicateur
+    recordLatency(latency) {
+        this.latencies.push(latency);
+        if (this.latencies.length > 10) {
+            this.latencies.shift(); // Garder les 10 dernières mesures
+        }
+        this.updateConnectionQuality();
+    }
+
+    // Mettre à jour l'indicateur visuel de qualité de connexion
+    updateConnectionQuality() {
+        const indicator = document.getElementById('connection-quality');
+        if (!indicator) return;
+
+        const avg = this.latencies.reduce((a, b) => a + b, 0) / this.latencies.length;
+        const icon = indicator.querySelector('.quality-icon');
+
+        if (avg < 100) {
+            icon.textContent = '🟢';
+            indicator.title = `Excellente connexion (${Math.round(avg)}ms)`;
+        } else if (avg < 250) {
+            icon.textContent = '🟡';
+            indicator.title = `Bonne connexion (${Math.round(avg)}ms)`;
+        } else if (avg < 500) {
+            icon.textContent = '🟠';
+            indicator.title = `Connexion moyenne (${Math.round(avg)}ms)`;
+        } else {
+            icon.textContent = '🔴';
+            indicator.title = `Connexion lente (${Math.round(avg)}ms)`;
+        }
     }
 
     // === AUTHENTIFICATION ===
@@ -427,7 +502,20 @@ class CourtOfShadowsClient {
                 this.showLobby();
             }
         } else {
-            this.showAuthError(data.error);
+            // Si c'était une tentative de reconnexion par token qui a échoué
+            if (this.user?.token && !sessionStorage.getItem('tempPassword')) {
+                // Token expiré, nettoyer et montrer l'écran de connexion
+                console.log('⚠️ Token expiré, reconnexion requise');
+                localStorage.removeItem('courtOfShadows_user');
+                sessionStorage.removeItem('courtOfShadows_roomId');
+                this.user = null;
+                this.isAuthenticated = false;
+                this.wasInGame = false;
+                this.showScreen('auth-screen');
+                this.showAuthError('Session expirée, veuillez vous reconnecter');
+            } else {
+                this.showAuthError(data.error);
+            }
         }
     }
 
@@ -657,34 +745,49 @@ class CourtOfShadowsClient {
             // Cacher l'indicateur de connexion perdue
             this.showConnectionStatus(false);
 
-            // Envoyer un ping toutes les 15 secondes pour maintenir la connexion
+            // Envoyer un ping toutes les 10 secondes pour maintenir la connexion et mesurer la latence
             this.pingInterval = setInterval(() => {
                 if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+                    this.lastPingTime = Date.now();
                     this.ws.send(JSON.stringify({ type: 'ping' }));
                 }
-            }, 15000);
+            }, 10000);
 
-            // Si on était authentifié avant (déconnexion) ou on a un user stocké (F5), se ré-authentifier
-            const savedPassword = sessionStorage.getItem('tempPassword');
-            if (savedPassword && this.playerName && (this.wasAuthenticated || this.isAuthenticated)) {
-                console.log('🔄 Ré-authentification automatique...');
-                this.send('login', { username: this.playerName, password: savedPassword });
-            } else if (this.isAuthenticated) {
-                // Pas de password pour re-login
-                if (this.wasInGame) {
-                    // On était en partie mais on ne peut pas se reconnecter sans password
-                    // Nettoyer et aller au lobby
+            // Ré-authentification automatique (priorité: token > password)
+            if (this.user?.token) {
+                // Authentification par token (fonctionne même après fermeture navigateur)
+                console.log('🔐 Ré-authentification par token...');
+                this.send('login_with_token', { token: this.user.token });
+            } else {
+                // Fallback: authentification par password (sessionStorage)
+                const savedPassword = sessionStorage.getItem('tempPassword');
+                if (savedPassword && this.playerName && (this.wasAuthenticated || this.isAuthenticated)) {
+                    console.log('🔄 Ré-authentification par password...');
+                    this.send('login', { username: this.playerName, password: savedPassword });
+                } else if (this.isAuthenticated) {
+                    // Pas de token ni password, impossible de re-login
+                    // Nettoyer et retourner à l'auth
+                    console.log('⚠️ Impossible de ré-authentifier, retour à l\'écran de connexion');
+                    localStorage.removeItem('courtOfShadows_user');
                     sessionStorage.removeItem('courtOfShadows_roomId');
+                    this.isAuthenticated = false;
                     this.wasInGame = false;
+                    this.user = null;
+                    this.showScreen('auth-screen');
                 }
-                this.showLobby();
             }
         };
 
         this.ws.onmessage = (event) => {
             const message = JSON.parse(event.data);
-            // Ignorer les pong silencieusement
-            if (message.type === 'pong') return;
+            // Mesurer la latence sur les pong
+            if (message.type === 'pong') {
+                if (this.lastPingTime) {
+                    const latency = Date.now() - this.lastPingTime;
+                    this.recordLatency(latency);
+                }
+                return;
+            }
             this.handleMessage(message);
         };
 

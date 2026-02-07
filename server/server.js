@@ -175,6 +175,10 @@ wss.on('connection', (ws) => {
                     handleLogin(ws, data);
                     break;
 
+                case 'login_with_token':
+                    handleLoginWithToken(ws, data);
+                    break;
+
                 case MESSAGE_TYPES.JOIN_GAME:
                     handleJoinGame(ws, data);
                     break;
@@ -302,6 +306,20 @@ wss.on('connection', (ws) => {
 
         if (result.success) {
             console.log(`Utilisateur connecté: ${username}`);
+        }
+    }
+
+    async function handleLoginWithToken(ws, data) {
+        const { token } = data;
+        const result = await auth.loginWithToken(token);
+
+        ws.send(JSON.stringify({
+            type: 'login_result',
+            ...result
+        }));
+
+        if (result.success) {
+            console.log(`Utilisateur reconnecté par token: ${result.user.username}`);
         }
     }
 

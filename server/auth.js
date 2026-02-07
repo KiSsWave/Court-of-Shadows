@@ -152,6 +152,66 @@ async function verifyToken(userId, token) {
     }
 }
 
+// Authentification par token seul (pour reconnexion après fermeture navigateur)
+async function loginWithToken(token) {
+    const client = await pool.connect();
+
+    try {
+        // Trouver la session par token
+        const sessionResult = await client.query(
+            'SELECT user_id FROM sessions WHERE token = $1 AND expires_at > CURRENT_TIMESTAMP',
+            [token]
+        );
+
+        if (sessionResult.rows.length === 0) {
+            return { success: false, error: 'Token invalide ou expiré' };
+        }
+
+        const userId = sessionResult.rows[0].user_id;
+
+        // Récupérer les infos utilisateur
+        const userResult = await client.query(
+            'SELECT id, username, is_premium, premium_until FROM users WHERE id = $1',
+            [userId]
+        );
+
+        if (userResult.rows.length === 0) {
+            return { success: false, error: 'Utilisateur non trouvé' };
+        }
+
+        const user = userResult.rows[0];
+
+        // Mettre à jour last_login
+        await client.query(
+            'UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = $1',
+            [userId]
+        );
+
+        // Récupérer les stats
+        const statsResult = await client.query(
+            'SELECT * FROM user_stats WHERE user_id = $1',
+            [userId]
+        );
+
+        return {
+            success: true,
+            user: {
+                id: user.id,
+                username: user.username,
+                token: token, // Garder le même token
+                isPremium: user.is_premium,
+                premiumUntil: user.premium_until,
+                stats: statsResult.rows[0] || {}
+            }
+        };
+    } catch (error) {
+        console.error('Erreur loginWithToken:', error);
+        return { success: false, error: 'Erreur serveur lors de l\'authentification' };
+    } finally {
+        client.release();
+    }
+}
+
 async function getUserById(userId) {
     const client = await pool.connect();
 
@@ -297,6 +357,7 @@ setInterval(cleanupExpiredSessions, 24 * 60 * 60 * 1000);
 module.exports = {
     register,
     login,
+    loginWithToken,
     verifyToken,
     getUserById,
     updateUserStats,

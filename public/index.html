@@ -267,6 +267,9 @@
                     <span>Impasse : </span>
                     <span id="deadlock-count">0</span>/3
                 </div>
+                <div class="connection-quality" id="connection-quality" title="Qualité de connexion">
+                    <span class="quality-icon">🟢</span>
+                </div>
                 <button id="game-rules-btn" class="btn-icon-settings" title="Règles du jeu">📖</button>
                 <button id="host-settings-btn" class="btn-icon-settings" style="display: none;" title="Paramètres de la partie">⚙️</button>
             </div>
@@ -524,6 +527,10 @@
                     <li>Il passe les 2 décrets restants au <strong>Chancelier</strong>.</li>
                     <li>Le <strong>Chancelier</strong> défausse 1 décret et adopte l'autre.</li>
                 </ol>
+                <p class="rules-highlight">
+                    <strong>🚫 Véto :</strong> Après 5 Complots adoptés, le Chancelier peut proposer un véto au lieu de jouer une carte.
+                    Si le Roi accepte, les 2 cartes sont défaussées et le compteur d'impasse augmente.
+                </p>
                 <p style="font-style: italic; color: #aaa; margin-top: 10px;">
                     Aucune communication n'est autorisée pendant la session. Après, les joueurs peuvent discuter
                     (et potentiellement mentir) sur les cartes qu'ils avaient.

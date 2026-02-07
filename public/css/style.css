@@ -1159,6 +1159,17 @@ input[type="password"]::placeholder {
     border: 1px solid var(--border);
 }
 
+/* Indicateur qualité connexion */
+.connection-quality {
+    padding: 4px 8px;
+    font-size: 0.9rem;
+    cursor: help;
+}
+
+.connection-quality .quality-icon {
+    transition: all var(--transition-base);
+}
+
 /* ========================================
    ZONE DE JEU PRINCIPALE
    ======================================== */
