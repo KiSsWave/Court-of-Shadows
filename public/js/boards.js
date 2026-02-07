@@ -1,23 +1,23 @@
-// Pouvoirs selon le nombre de joueurs
+// Pouvoirs selon le nombre de joueurs (avec emojis)
 // 5-6 joueurs : 1-2: Rien, 3: Peek (Inspection), 4-5: Exécution, 6: Victoire
 // 7-8 joueurs : 1: Rien, 2: Enquête, 3: Succession, 4-5: Exécution, 6: Victoire
 // 9-10 joueurs : 1-2: Enquête, 3: Succession, 4-5: Exécution, 6: Victoire
 
 function updateBoardPowers(playerCount) {
-    const markers = document.querySelectorAll('.conspirators-marker .power-icon');
+    const markers = document.querySelectorAll('.conspirators-marker .power-label');
 
-    // Définir les pouvoirs selon le nombre de joueurs
+    // Définir les pouvoirs selon le nombre de joueurs (emojis)
     let powers = [];
 
     if (playerCount <= 6) {
         // 5-6 joueurs
-        powers = ['', '', 'Inspection', 'Exécution', 'Exécution', 'VICTOIRE'];
+        powers = ['', '', '👁️', '💀', '💀', '🏆'];
     } else if (playerCount <= 8) {
         // 7-8 joueurs
-        powers = ['', 'Enquête', 'Succession', 'Exécution', 'Exécution', 'VICTOIRE'];
+        powers = ['', '🔍', '👑', '💀', '💀', '🏆'];
     } else {
         // 9-10 joueurs
-        powers = ['Enquête', 'Enquête', 'Succession', 'Exécution', 'Exécution', 'VICTOIRE'];
+        powers = ['🔍', '🔍', '👑', '💀', '💀', '🏆'];
     }
 
     markers.forEach((marker, index) => {

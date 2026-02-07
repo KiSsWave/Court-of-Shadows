@@ -361,7 +361,16 @@ class CourtOfShadowsClient {
                 this.user = JSON.parse(storedUser);
                 this.isAuthenticated = true;
                 this.playerName = this.user.username;
-                this.showLobby();
+
+                // Récupérer le roomId stocké (pour reconnexion après F5)
+                const storedRoomId = sessionStorage.getItem('courtOfShadows_roomId');
+                if (storedRoomId) {
+                    this.roomId = storedRoomId;
+                    this.wasInGame = true;
+                    // Ne pas montrer le lobby, attendre la reconnexion après connect()
+                } else {
+                    this.showLobby();
+                }
             } catch (e) {
                 localStorage.removeItem('courtOfShadows_user');
             }
@@ -445,6 +454,7 @@ class CourtOfShadowsClient {
         this.playerName = null;
         localStorage.removeItem('courtOfShadows_user');
         sessionStorage.removeItem('tempPassword');
+        sessionStorage.removeItem('courtOfShadows_roomId');
         this.showScreen('auth-screen');
     }
 
@@ -654,13 +664,20 @@ class CourtOfShadowsClient {
                 }
             }, 15000);
 
-            // Si on était authentifié avant, se ré-authentifier automatiquement
-            if (this.playerName && this.wasAuthenticated) {
+            // Si on était authentifié avant (déconnexion) ou on a un user stocké (F5), se ré-authentifier
+            const savedPassword = sessionStorage.getItem('tempPassword');
+            if (savedPassword && this.playerName && (this.wasAuthenticated || this.isAuthenticated)) {
                 console.log('🔄 Ré-authentification automatique...');
-                const savedPassword = sessionStorage.getItem('tempPassword');
-                if (savedPassword) {
-                    this.send('login', { username: this.playerName, password: savedPassword });
+                this.send('login', { username: this.playerName, password: savedPassword });
+            } else if (this.isAuthenticated) {
+                // Pas de password pour re-login
+                if (this.wasInGame) {
+                    // On était en partie mais on ne peut pas se reconnecter sans password
+                    // Nettoyer et aller au lobby
+                    sessionStorage.removeItem('courtOfShadows_roomId');
+                    this.wasInGame = false;
                 }
+                this.showLobby();
             }
         };
 
@@ -1106,12 +1123,14 @@ class CourtOfShadowsClient {
 
         if (newGameBtn) {
             newGameBtn.addEventListener('click', () => {
+                sessionStorage.removeItem('courtOfShadows_roomId');
                 window.location.reload();
             });
         }
 
         if (returnLobbyBtn) {
             returnLobbyBtn.addEventListener('click', () => {
+                sessionStorage.removeItem('courtOfShadows_roomId');
                 window.location.reload();
             });
         }
@@ -1246,6 +1265,9 @@ class CourtOfShadowsClient {
             this.isHost = message.data.isHost;
             this.wasInGame = false; // Reset le flag
 
+            // Stocker le roomId pour reconnexion après F5
+            sessionStorage.setItem('courtOfShadows_roomId', this.roomId);
+
             // Si reconnexion, aller directement à l'écran de jeu
             if (message.data.reconnected) {
                 this.showScreen('game-screen');
@@ -1257,6 +1279,7 @@ class CourtOfShadowsClient {
         } else {
             // Reconnexion échouée, aller au lobby
             this.wasInGame = false;
+            sessionStorage.removeItem('courtOfShadows_roomId');
             if (this.isAuthenticated) {
                 this.showLobby();
             }
@@ -1397,6 +1420,8 @@ class CourtOfShadowsClient {
     }
 
     leaveGame() {
+        // Nettoyer le roomId stocké avant de recharger
+        sessionStorage.removeItem('courtOfShadows_roomId');
         window.location.reload();
     }
 
@@ -2504,6 +2529,8 @@ class CourtOfShadowsClient {
 
     // === GAME OVER ===
     handleGameOver(data) {
+        // Nettoyer le roomId - la partie est terminée
+        sessionStorage.removeItem('courtOfShadows_roomId');
         this.showScreen('game-over-screen');
 
         const title = document.getElementById('winner-title');

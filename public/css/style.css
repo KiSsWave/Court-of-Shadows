@@ -766,7 +766,7 @@ input[type="password"]::placeholder {
 }
 
 /* ========================================
-   PLATEAUX DE PROGRESSION - CONSERVÉS
+   PLATEAUX DE PROGRESSION
    ======================================== */
 
 .progression-boards-container {
@@ -780,162 +780,107 @@ input[type="password"]::placeholder {
     position: relative;
     border-radius: var(--radius-lg);
     overflow: hidden;
-    min-height: 180px;
+    padding: 12px;
     box-shadow: var(--shadow-md);
     border: 2px solid var(--border);
-    transition: transform var(--transition-base);
 }
 
-.progression-board:hover {
-    transform: translateY(-2px);
+/* Titre du plateau */
+.board-header {
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
 }
 
 /* Plateau des Complots */
 .progression-board.conspirators {
     background: linear-gradient(135deg,
-        rgba(220, 38, 38, 0.2) 0%,
-        rgba(127, 29, 29, 0.4) 50%,
-        var(--bg-secondary) 100%
+        rgba(220, 38, 38, 0.25) 0%,
+        rgba(127, 29, 29, 0.4) 100%
     );
     border-color: var(--conspirator-border);
 }
 
-.progression-board.conspirators::before {
-    content: '🗡️ COMPLOTS 🗡️';
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 1.1rem;
-    font-weight: 900;
+.progression-board.conspirators .board-header {
     color: var(--conspirator-border);
-    letter-spacing: 2px;
-    z-index: 1;
 }
 
 /* Plateau des Édits */
 .progression-board.loyalists {
     background: linear-gradient(135deg,
-        rgba(37, 99, 235, 0.2) 0%,
-        rgba(30, 64, 175, 0.4) 50%,
-        var(--bg-secondary) 100%
+        rgba(37, 99, 235, 0.25) 0%,
+        rgba(30, 64, 175, 0.4) 100%
     );
     border-color: var(--loyalist-border);
 }
 
-.progression-board.loyalists::before {
-    content: '⚜️ ÉDITS ROYAUX ⚜️';
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 1.1rem;
-    font-weight: 900;
+.progression-board.loyalists .board-header {
     color: var(--loyalist-border);
-    letter-spacing: 3px;
-    z-index: 1;
-}
-
-/* Overlay subtil */
-.board-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg,
-        rgba(0, 0, 0, 0.1) 0%,
-        rgba(0, 0, 0, 0.3) 100%
-    );
-    pointer-events: none;
 }
 
 /* Marqueurs de progression */
 .progress-markers {
     display: flex;
     justify-content: space-evenly;
-    align-items: center;
-    padding: 45px 15px 20px;
-    position: relative;
-    z-index: 2;
-}
-
-.progress-markers.edits {
-    padding: 50px 25px 20px;
+    align-items: flex-start;
+    gap: 8px;
 }
 
 .progress-marker {
-    width: 55px;
-    height: 75px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.marker-emoji {
+    width: 48px;
+    height: 48px;
     border-radius: var(--radius-md);
     background: var(--bg-primary);
     border: 2px solid var(--border);
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    position: relative;
-    transition: all var(--transition-base);
-    box-shadow: var(--shadow-sm);
-    overflow: hidden;
-}
-
-.progress-marker .marker-card {
-    width: 38px;
-    height: 52px;
-    object-fit: cover;
-    border-radius: 4px;
+    font-size: 1.5rem;
     opacity: 0.3;
     filter: grayscale(100%);
     transition: all var(--transition-base);
 }
 
-.progress-marker .power-icon {
-    position: absolute;
-    bottom: 5px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 0.6rem;
-    font-weight: 700;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    opacity: 0.7;
-    white-space: nowrap;
+.power-label {
+    font-size: 0.9rem;
+    opacity: 0.6;
+    height: 20px;
 }
 
 /* Marqueur actif - Conspirateurs */
-.progress-marker.active.conspirators-marker {
+.progress-marker.active.conspirators-marker .marker-emoji {
     background: linear-gradient(135deg,
         var(--conspirator-red) 0%,
         var(--conspirator-dark) 100%
     );
     border-color: var(--conspirator-border);
-    border-width: 2px;
     box-shadow: 0 0 12px rgba(220, 38, 38, 0.5);
-    transform: scale(1.05);
-}
-
-.progress-marker.active.conspirators-marker .marker-card {
     opacity: 1;
     filter: grayscale(0%);
+    transform: scale(1.1);
 }
 
 /* Marqueur actif - Loyalistes */
-.progress-marker.active.loyalists-marker {
+.progress-marker.active.loyalists-marker .marker-emoji {
     background: linear-gradient(135deg,
         var(--loyalist-blue) 0%,
         #1e40af 100%
     );
     border-color: var(--loyalist-border);
-    border-width: 2px;
     box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
-    transform: scale(1.05);
-}
-
-.progress-marker.active.loyalists-marker .marker-card {
     opacity: 1;
     filter: grayscale(0%);
+    transform: scale(1.1);
 }
 
 /* ========================================
@@ -2316,46 +2261,41 @@ input[type="password"]::placeholder {
         font-size: 1rem;
     }
 
-    /* Progression boards mobile - 2 colonnes */
+    /* Progression boards mobile - empilés verticalement */
     .progression-boards-container {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
         gap: 8px;
         margin: 6px 0;
     }
 
     .progression-board {
-        padding: 8px 5px;
-        min-height: 85px;
+        padding: 8px 10px;
     }
 
-    .progression-board.conspirators::before,
-    .progression-board.loyalists::before {
-        font-size: 0.7rem;
-        top: 4px;
-        letter-spacing: 1px;
+    .board-header {
+        font-size: 0.85rem;
+        margin-bottom: 6px;
     }
 
     .progress-markers {
-        padding: 28px 5px 8px;
-        gap: 3px;
-    }
-
-    .progress-markers.edits {
-        padding: 28px 8px 8px;
+        gap: 4px;
     }
 
     .progress-marker {
+        flex-direction: row;
+        gap: 2px;
+    }
+
+    .marker-emoji {
         width: 32px;
-        height: 44px;
+        height: 32px;
+        font-size: 1rem;
     }
 
-    .progress-marker .marker-card {
-        width: 22px;
-        height: 30px;
-    }
-
-    .progress-marker .power-icon {
-        font-size: 0.45rem;
+    .power-label {
+        font-size: 0.7rem;
+        height: auto;
+        width: 16px;
     }
 
     /* User info mobile */
@@ -2386,6 +2326,19 @@ input[type="password"]::placeholder {
     .game-type-btn {
         width: 100%;
         padding: 12px;
+    }
+
+    /* Vote buttons mobile - vertical */
+    .vote-buttons {
+        flex-direction: column;
+        gap: 15px;
+        margin: 20px 0;
+    }
+
+    .vote-btn {
+        padding: 20px 40px;
+        font-size: 1.2rem;
+        min-width: 180px;
     }
 
     /* Auth tabs mobile */
