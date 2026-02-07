@@ -1203,12 +1203,12 @@ class CourtOfShadowsClient {
         }
 
         // Sections pliables (mobile)
-        const togglePlayers = document.getElementById('toggle-players');
+        const toggleBoards = document.getElementById('toggle-boards');
         const toggleChat = document.getElementById('toggle-chat');
 
-        if (togglePlayers) {
-            togglePlayers.addEventListener('click', () => {
-                const section = document.getElementById('players-section');
+        if (toggleBoards) {
+            toggleBoards.addEventListener('click', () => {
+                const section = document.getElementById('boards-section');
                 section.classList.toggle('collapsed');
             });
         }

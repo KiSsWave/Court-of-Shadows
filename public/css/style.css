@@ -1210,6 +1210,13 @@ input[type="password"]::placeholder {
     display: block;
 }
 
+/* Wrapper des plateaux - transparent sur desktop */
+.progression-boards-wrapper .section-content {
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
 #game-players-list {
     display: flex;
     flex-direction: column;
@@ -2122,7 +2129,6 @@ input[type="password"]::placeholder {
     }
 
     /* Sections pliables mobile */
-    .game-players,
     .game-chat {
         padding: 0;
         background: transparent;
@@ -2130,8 +2136,8 @@ input[type="password"]::placeholder {
         box-shadow: none;
     }
 
-    .game-players.collapsed .section-content,
-    .game-chat.collapsed .section-content {
+    .game-chat.collapsed .section-content,
+    .progression-boards-wrapper.collapsed .section-content {
         display: none;
     }
 
@@ -2171,13 +2177,35 @@ input[type="password"]::placeholder {
         border: 1px solid var(--border);
     }
 
-    .game-players h3,
+    /* Plateaux pliables sur mobile */
+    .progression-boards-wrapper {
+        margin-bottom: 10px;
+    }
+
+    .progression-boards-wrapper .section-content {
+        padding: 8px;
+    }
+
+    /* Joueurs toujours visibles sur mobile */
+    .game-players {
+        padding: 10px;
+        background: var(--bg-secondary);
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border);
+    }
+
+    .game-players h3 {
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+        color: var(--primary-light);
+    }
+
     .game-chat h3 {
         display: none;
     }
 
     #game-players-list {
-        max-height: 200px;
+        max-height: 150px;
         overflow-y: auto;
     }
 
