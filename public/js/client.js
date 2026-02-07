@@ -1009,10 +1009,19 @@ class CourtOfShadowsClient {
 
     handleGameStopped(data) {
         this.showNotification(`🛑 ${data.message}`);
-        // Retourner à la salle d'attente
+        // Reset complet de l'état de jeu
         this.playerRole = null;
         this.playerFaction = null;
         this.knownPlayers = [];
+        this.gameState = null;
+        this.currentVoteDetails = null;
+        this.votedPlayerIds = [];
+        this.isSelectingDecrees = false;
+        this.isUsingPower = false;
+        this.isShowingPowerResult = false;
+        this.isWaitingForVetoResponse = false;
+        this.lastReceivedCards = null;
+        // Retourner à la salle d'attente
         this.showWaitingRoom();
     }
 
@@ -1557,8 +1566,18 @@ class CourtOfShadowsClient {
 
     // === RÉVÉLATION DES RÔLES ===
     handleRoleAssignment(data) {
+        // Reset complet pour nouvelle partie
+        this.knownPlayers = [];
         this.playerRole = data.role;
         this.playerFaction = data.faction;
+        this.gameState = null;
+        this.currentVoteDetails = null;
+        this.votedPlayerIds = [];
+        this.isSelectingDecrees = false;
+        this.isUsingPower = false;
+        this.isShowingPowerResult = false;
+        this.isWaitingForVetoResponse = false;
+        this.lastReceivedCards = null;
 
         this.showScreen('role-reveal');
 
@@ -1566,6 +1585,12 @@ class CourtOfShadowsClient {
         const roleIcon = document.getElementById('role-icon');
         const roleTitle = document.getElementById('role-title');
         const roleDesc = document.getElementById('role-description');
+
+        // Nettoyer les éléments dynamiques de la partie précédente
+        const oldAlliesInfo = roleCard.querySelector('.allies-info');
+        if (oldAlliesInfo) {
+            oldAlliesInfo.remove();
+        }
 
         // Définir le contenu selon le rôle
         if (data.role === ROLES.USURPER) {

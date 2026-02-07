@@ -819,6 +819,7 @@ class Game {
         this.isPaused = false;
         this.pausedPhase = null;
         this.disconnectedPlayers = new Map();
+        this.eliminatedPlayers = new Set();
         this.vetoUnlocked = false;
         this.vetoPending = false;
         this.winningFaction = null;

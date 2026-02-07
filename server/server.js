@@ -961,6 +961,14 @@ wss.on('connection', (ws) => {
         const result = game.stopGame(playerId);
 
         if (result.success) {
+            // Annuler toutes les notifications de déconnexion en attente pour cette partie
+            for (const [key, timeoutId] of pendingDisconnectNotifications.entries()) {
+                if (key.startsWith(`${roomId}:`)) {
+                    clearTimeout(timeoutId);
+                    pendingDisconnectNotifications.delete(key);
+                }
+            }
+
             // Notifier tous les joueurs
             broadcastToGame(roomId, {
                 type: MESSAGE_TYPES.GAME_STOPPED,
@@ -971,6 +979,7 @@ wss.on('connection', (ws) => {
 
             // Renvoyer la liste des joueurs et l'état (lobby)
             sendPlayerList(roomId);
+            sendGameStateToAll(roomId);
 
             console.log(`Partie ${roomId} arrêtée par le créateur`);
         }
@@ -1182,7 +1191,7 @@ wss.on('connection', (ws) => {
                 const paused = game.pauseGame(playerName, playerId);
 
                 if (paused) {
-                    // Délai de 2 secondes avant d'afficher la notification
+                    // Délai de 2 secondes avant d'afficher la notification et l'état de pause
                     // (permet de ne pas notifier si le joueur fait juste F5)
                     const notificationKey = `${roomId}:${playerName}`;
 
@@ -1199,14 +1208,13 @@ wss.on('connection', (ws) => {
                                     message: `${playerName} s'est déconnecté. La partie est en pause.`
                                 }
                             });
+                            // Envoyer l'état de jeu seulement après le délai
+                            sendGameStateToAll(roomId);
                             console.log(`Partie ${roomId} en pause (${playerName} déconnecté)`);
                         }
                     }, 2000);
 
                     pendingDisconnectNotifications.set(notificationKey, timeoutId);
-
-                    // Envoyer l'état de jeu immédiatement (pour la pause)
-                    sendGameStateToAll(roomId);
                     gameManager.updateActivity(roomId);
                 }
             } else {
