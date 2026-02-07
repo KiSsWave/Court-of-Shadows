@@ -3382,6 +3382,7 @@ input[type="password"]::placeholder {
 }
 
 .game-settings.settings-readonly h3::after {
+    content: " (définis par l'hôte)";
     font-size: 0.75rem;
     color: var(--text-muted);
     font-weight: normal;

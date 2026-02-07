@@ -1427,6 +1427,33 @@ class CourtOfShadowsClient {
         });
     }
 
+    // Mettre à jour l'affichage des paramètres pour tous les joueurs
+    updateSettingsDisplay(settings, playerCount) {
+        const conspiratorsKnowUsurper = document.getElementById('setting-conspirators-know-usurper');
+        const usurperKnowsAllies = document.getElementById('setting-usurper-knows-allies');
+        const limitedKnowledge = document.getElementById('setting-limited-conspirators-knowledge');
+        const previousKingCannotBeChancellor = document.getElementById('setting-previous-king-cannot-be-chancellor');
+        const limitedKnowledgeContainer = document.getElementById('setting-limited-knowledge-container');
+
+        if (conspiratorsKnowUsurper) {
+            conspiratorsKnowUsurper.checked = settings.conspiratorsKnowUsurper || false;
+        }
+        if (usurperKnowsAllies) {
+            usurperKnowsAllies.checked = settings.usurperKnowsAllies || false;
+        }
+        if (limitedKnowledge) {
+            limitedKnowledge.checked = settings.limitedConspiratorsKnowledge || false;
+        }
+        if (previousKingCannotBeChancellor) {
+            previousKingCannotBeChancellor.checked = settings.previousKingCannotBeChancellor || false;
+        }
+
+        // Afficher/masquer l'option de connaissance limitée selon le nombre de joueurs
+        if (limitedKnowledgeContainer) {
+            limitedKnowledgeContainer.style.display = playerCount >= 9 ? 'block' : 'none';
+        }
+    }
+
     copyRoomCode() {
         navigator.clipboard.writeText(this.roomId);
         const btn = document.getElementById('copy-code-btn');
@@ -1806,6 +1833,11 @@ class CourtOfShadowsClient {
         // Stocker les joueurs connus (pour la coloration)
         if (state.knownPlayers) {
             this.knownPlayers = state.knownPlayers;
+        }
+
+        // Mettre à jour l'affichage des paramètres (salle d'attente)
+        if (state.settings) {
+            this.updateSettingsDisplay(state.settings, state.playerCount);
         }
 
         // Mettre à jour les scores

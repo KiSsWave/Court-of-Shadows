@@ -66,6 +66,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 // Gestionnaire de parties
 const gameManager = new GameManager();
 const playerConnections = new Map(); // playerId -> { ws, roomId, playerName, username }
+const pendingDisconnectNotifications = new Map(); // `${roomId}:${playerName}` -> timeoutId
 
 // Générer un ID unique
 function generateId() {
@@ -1103,6 +1104,17 @@ wss.on('connection', (ws) => {
         const reconnectResult = foundGame.reconnectPlayer(playerName, playerId, ws);
 
         if (reconnectResult) {
+            // Annuler la notification de déconnexion en attente (si le joueur a fait F5)
+            const notificationKey = `${foundRoomId}:${playerName}`;
+            const pendingTimeout = pendingDisconnectNotifications.get(notificationKey);
+            const wasQuickReconnect = !!pendingTimeout; // Reconnexion en moins de 2s
+
+            if (pendingTimeout) {
+                clearTimeout(pendingTimeout);
+                pendingDisconnectNotifications.delete(notificationKey);
+                console.log(`🔄 Notification de déconnexion annulée pour ${playerName} (reconnexion rapide)`);
+            }
+
             // Supprimer l'ancienne connexion pour éviter les doublons
             if (reconnectResult.oldPlayerId) {
                 playerConnections.delete(reconnectResult.oldPlayerId);
@@ -1138,7 +1150,8 @@ wss.on('connection', (ws) => {
                 return;
             }
 
-            if (!foundGame.isPaused) {
+            // Ne pas afficher "reconnecté" si personne n'a vu la déconnexion
+            if (!foundGame.isPaused && !wasQuickReconnect) {
                 broadcastToGame(foundRoomId, {
                     type: MESSAGE_TYPES.GAME_RESUMED,
                     data: { playerName }
@@ -1169,17 +1182,32 @@ wss.on('connection', (ws) => {
                 const paused = game.pauseGame(playerName, playerId);
 
                 if (paused) {
-                    broadcastToGame(roomId, {
-                        type: MESSAGE_TYPES.GAME_PAUSED,
-                        data: {
-                            disconnectedPlayer: playerName,
-                            message: `${playerName} s'est déconnecté. La partie est en pause.`
-                        }
-                    });
+                    // Délai de 2 secondes avant d'afficher la notification
+                    // (permet de ne pas notifier si le joueur fait juste F5)
+                    const notificationKey = `${roomId}:${playerName}`;
 
+                    const timeoutId = setTimeout(() => {
+                        pendingDisconnectNotifications.delete(notificationKey);
+
+                        // Vérifier que le joueur est toujours déconnecté
+                        const currentGame = gameManager.getGame(roomId);
+                        if (currentGame && currentGame.disconnectedPlayers.has(playerName)) {
+                            broadcastToGame(roomId, {
+                                type: MESSAGE_TYPES.GAME_PAUSED,
+                                data: {
+                                    disconnectedPlayer: playerName,
+                                    message: `${playerName} s'est déconnecté. La partie est en pause.`
+                                }
+                            });
+                            console.log(`Partie ${roomId} en pause (${playerName} déconnecté)`);
+                        }
+                    }, 2000);
+
+                    pendingDisconnectNotifications.set(notificationKey, timeoutId);
+
+                    // Envoyer l'état de jeu immédiatement (pour la pause)
                     sendGameStateToAll(roomId);
                     gameManager.updateActivity(roomId);
-                    console.log(`Partie ${roomId} en pause (${playerName} déconnecté)`);
                 }
             } else {
                 game.removePlayer(playerId);
