@@ -179,6 +179,16 @@ body {
     letter-spacing: 4px;
     text-transform: uppercase;
     text-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
+    animation: titleFloat 4s ease-in-out infinite;
+}
+
+@keyframes titleFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
 }
 
 .subtitle {
@@ -712,9 +722,10 @@ input[type="password"]::placeholder {
 
 /* Bouton retour */
 .btn-back {
-    position: absolute;
+    position: fixed;
     top: 20px;
-    left: 20px;
+    right: 20px;
+    z-index: 100;
     padding: 10px 20px;
     font-size: 0.9rem;
     z-index: 100;
@@ -724,7 +735,7 @@ input[type="password"]::placeholder {
     .btn-back {
         position: fixed;
         top: 10px;
-        left: 10px;
+        right: 10px;
         padding: 8px 16px;
         font-size: 0.85rem;
     }
