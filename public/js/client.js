@@ -297,6 +297,7 @@ class CourtOfShadowsClient {
         this.setupAuthListeners();
         this.setupEventListeners();
         this.setupConnectionMonitoring(); // Visibility API + Network detection
+        this.initRouter(); // Routing SPA
         this.checkStoredAuth();
         this.connect(); // Se connecter au serveur dès le début
         soundManager.init(); // Initialiser le gestionnaire de sons
@@ -1101,12 +1102,126 @@ class CourtOfShadowsClient {
         }
     }
 
+    // === ROUTING ===
+    screenToRoute = {
+        'auth-screen': '/login',
+        'lobby-screen': '/home',
+        'waiting-room': '/room/',
+        'role-reveal': '/game/',
+        'game-screen': '/game/',
+        'game-over-screen': '/game/',
+        'rules-screen': '/rules'
+    };
+
+    routeToScreen = {
+        '/': 'lobby-screen',
+        '/home': 'lobby-screen',
+        '/login': 'auth-screen',
+        '/register': 'auth-screen',
+        '/rules': 'rules-screen'
+    };
+
+    initRouter() {
+        // Gérer les boutons back/forward du navigateur
+        window.addEventListener('popstate', (event) => {
+            if (event.state && event.state.screen) {
+                this.showScreenWithoutPush(event.state.screen);
+            } else {
+                this.handleRoute(window.location.pathname);
+            }
+        });
+
+        // Gérer la route initiale
+        this.handleRoute(window.location.pathname);
+    }
+
+    handleRoute(path) {
+        // Routes avec paramètres
+        if (path.startsWith('/room/')) {
+            const code = path.split('/room/')[1];
+            if (code && this.isAuthenticated) {
+                this.roomId = code.toUpperCase();
+                sessionStorage.setItem('courtOfShadows_roomId', this.roomId);
+                // Le WebSocket gérera la reconnexion
+            }
+            return;
+        }
+
+        if (path.startsWith('/game/')) {
+            const code = path.split('/game/')[1];
+            if (code && this.isAuthenticated) {
+                this.roomId = code.toUpperCase();
+                sessionStorage.setItem('courtOfShadows_roomId', this.roomId);
+            }
+            return;
+        }
+
+        // Routes simples
+        const screen = this.routeToScreen[path];
+        if (screen) {
+            // Si la route est /register, afficher l'onglet inscription
+            if (path === '/register') {
+                setTimeout(() => {
+                    const registerTab = document.querySelector('[data-tab="register"]');
+                    if (registerTab) registerTab.click();
+                }, 100);
+            }
+        }
+    }
+
+    updateUrl(screenId) {
+        let path = this.screenToRoute[screenId] || '/';
+
+        // Ajouter le code de room si nécessaire
+        if ((screenId === 'waiting-room' || screenId === 'game-screen' || screenId === 'role-reveal') && this.roomId) {
+            if (screenId === 'waiting-room') {
+                path = '/room/' + this.roomId;
+            } else {
+                path = '/game/' + this.roomId;
+            }
+        }
+
+        // Ne pas pusher si on est déjà sur cette URL
+        if (window.location.pathname !== path) {
+            history.pushState({ screen: screenId }, '', path);
+        }
+    }
+
+    showScreenWithoutPush(screenId) {
+        document.querySelectorAll('.screen').forEach(screen => {
+            screen.classList.remove('active');
+        });
+        const screenEl = document.getElementById(screenId);
+        if (screenEl) {
+            screenEl.classList.add('active');
+        }
+    }
+
     // === ÉCRANS ===
+    screenTitles = {
+        'auth-screen': 'Login - Court of Shadows',
+        'lobby-screen': 'Home - Court of Shadows',
+        'waiting-room': 'Waiting Room - Court of Shadows',
+        'role-reveal': 'Game - Court of Shadows',
+        'game-screen': 'Game - Court of Shadows',
+        'game-over-screen': 'Game Over - Court of Shadows',
+        'rules-screen': 'Rules - Court of Shadows'
+    };
+
     showScreen(screenId) {
         document.querySelectorAll('.screen').forEach(screen => {
             screen.classList.remove('active');
         });
-        document.getElementById(screenId).classList.add('active');
+        const screenEl = document.getElementById(screenId);
+        if (screenEl) {
+            screenEl.classList.add('active');
+        }
+
+        // Mettre à jour l'URL
+        this.updateUrl(screenId);
+
+        // Mettre à jour le titre de la page
+        document.title = this.screenTitles[screenId] || 'Court of Shadows';
     }
 
     // === LOBBY ===

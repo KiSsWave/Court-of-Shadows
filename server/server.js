@@ -63,6 +63,14 @@ initDatabase().catch(err => {
 // Servir les fichiers statiques
 app.use(express.static(path.join(__dirname, '../public')));
 
+// Routes SPA - toutes les routes renvoient index.html
+app.get('/home', (req, res) => res.sendFile(path.join(__dirname, '../public/index.html')));
+app.get('/login', (req, res) => res.sendFile(path.join(__dirname, '../public/index.html')));
+app.get('/register', (req, res) => res.sendFile(path.join(__dirname, '../public/index.html')));
+app.get('/rules', (req, res) => res.sendFile(path.join(__dirname, '../public/index.html')));
+app.get('/room/:code', (req, res) => res.sendFile(path.join(__dirname, '../public/index.html')));
+app.get('/game/:code', (req, res) => res.sendFile(path.join(__dirname, '../public/index.html')));
+
 // Gestionnaire de parties
 const gameManager = new GameManager();
 const playerConnections = new Map(); // playerId -> { ws, roomId, playerName, username }

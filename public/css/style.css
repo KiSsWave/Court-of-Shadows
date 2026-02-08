@@ -722,10 +722,9 @@ input[type="password"]::placeholder {
 
 /* Bouton retour */
 .btn-back {
-    position: fixed;
+    position: absolute;
     top: 20px;
     right: 20px;
-    z-index: 100;
     padding: 10px 20px;
     font-size: 0.9rem;
     width: auto;
@@ -734,12 +733,10 @@ input[type="password"]::placeholder {
 
 @media (max-width: 768px) {
     .btn-back {
-        position: fixed;
         top: 10px;
         right: 10px;
         padding: 8px 16px;
         font-size: 0.85rem;
-        width: auto;
     }
 }
 
