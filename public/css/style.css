@@ -217,16 +217,16 @@ body {
 
 .auth-layout {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 60px;
     min-height: 100vh;
-    padding: 20px 40px;
 }
 
 .auth-content {
     flex: 1;
-    max-width: 450px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px 60px;
+    max-width: 55%;
 }
 
 .auth-content .title {
@@ -240,11 +240,16 @@ body {
 }
 
 .auth-logo {
-    flex: 0 0 auto;
+    flex: 0 0 45%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.3) 100%);
+    border-left: 1px solid var(--border);
 }
 
 .auth-logo img {
-    max-width: 400px;
+    max-width: 70%;
     max-height: 70vh;
     filter: drop-shadow(0 8px 30px rgba(0, 0, 0, 0.6));
 }
@@ -255,16 +260,16 @@ body {
 
 .waiting-layout {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 40px;
     min-height: 100vh;
-    padding: 20px 40px;
 }
 
 .waiting-content {
     flex: 1;
-    max-width: 700px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 30px 40px;
+    max-width: 60%;
 }
 
 .waiting-content .title {
@@ -281,11 +286,16 @@ body {
 }
 
 .waiting-logo {
-    flex: 0 0 auto;
+    flex: 0 0 40%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.3) 100%);
+    border-left: 1px solid var(--border);
 }
 
 .waiting-logo img {
-    max-width: 350px;
+    max-width: 70%;
     max-height: 60vh;
     filter: drop-shadow(0 8px 30px rgba(0, 0, 0, 0.6));
 }
@@ -296,16 +306,13 @@ body {
 
 .lobby-layout {
     display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 40px;
     min-height: 100vh;
-    padding: 20px 40px;
 }
 
 .lobby-content {
     flex: 1;
-    max-width: 900px;
+    padding: 30px 40px;
+    max-width: 65%;
 }
 
 .lobby-header {
@@ -323,13 +330,17 @@ body {
 }
 
 .lobby-logo {
-    flex: 0 0 auto;
-    padding-top: 40px;
+    flex: 0 0 35%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.3) 100%);
+    border-left: 1px solid var(--border);
 }
 
 .lobby-logo img {
-    max-width: 300px;
-    max-height: 50vh;
+    max-width: 80%;
+    max-height: 70vh;
     filter: drop-shadow(0 8px 30px rgba(0, 0, 0, 0.6));
 }
 
@@ -2187,17 +2198,18 @@ input[type="password"]::placeholder {
         padding: 20px 10px;
     }
 
-    /* Auth layout mobile - vertical */
+    /* Auth layout mobile - logo masqué */
     .auth-layout {
-        flex-direction: column;
-        gap: 20px;
-        padding: 20px;
-        min-height: auto;
+        display: block;
     }
 
     .auth-content {
         max-width: 100%;
-        order: 2;
+        padding: 20px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
 
     .auth-content .title,
@@ -2206,25 +2218,17 @@ input[type="password"]::placeholder {
     }
 
     .auth-logo {
-        order: 1;
+        display: none;
     }
 
-    .auth-logo img {
-        max-width: 150px;
-        max-height: 150px;
-    }
-
-    /* Waiting layout mobile - vertical */
+    /* Waiting layout mobile - logo masqué */
     .waiting-layout {
-        flex-direction: column;
-        gap: 15px;
-        padding: 15px;
-        min-height: auto;
+        display: block;
     }
 
     .waiting-content {
         max-width: 100%;
-        order: 2;
+        padding: 15px;
     }
 
     .waiting-content .title {
@@ -2238,25 +2242,17 @@ input[type="password"]::placeholder {
     }
 
     .waiting-logo {
-        order: 1;
+        display: none;
     }
 
-    .waiting-logo img {
-        max-width: 120px;
-        max-height: 120px;
-    }
-
-    /* Lobby layout mobile - vertical */
+    /* Lobby layout mobile - logo masqué */
     .lobby-layout {
-        flex-direction: column;
-        gap: 15px;
-        padding: 15px;
-        min-height: auto;
+        display: block;
     }
 
     .lobby-content {
         max-width: 100%;
-        order: 2;
+        padding: 15px;
     }
 
     .lobby-header {
@@ -2269,13 +2265,7 @@ input[type="password"]::placeholder {
     }
 
     .lobby-logo {
-        order: 1;
-        padding-top: 10px;
-    }
-
-    .lobby-logo img {
-        max-width: 120px;
-        max-height: 120px;
+        display: none;
     }
 
     .title {
