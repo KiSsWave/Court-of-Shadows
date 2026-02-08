@@ -728,7 +728,8 @@ input[type="password"]::placeholder {
     z-index: 100;
     padding: 10px 20px;
     font-size: 0.9rem;
-    z-index: 100;
+    width: auto;
+    display: inline-block;
 }
 
 @media (max-width: 768px) {
@@ -738,6 +739,7 @@ input[type="password"]::placeholder {
         right: 10px;
         padding: 8px 16px;
         font-size: 0.85rem;
+        width: auto;
     }
 }
 
