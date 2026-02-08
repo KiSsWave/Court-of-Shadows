@@ -4,59 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Court of Shadows</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <link rel="apple-touch-icon" href="images/logo.png">
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
 <!-- Écran d'authentification -->
 <div id="auth-screen" class="screen active">
-    <div class="container">
-        <div class="logo-container">
-            <img src="images/logo.png" alt="Court of Shadows">
+    <div class="auth-layout">
+        <div class="auth-content">
+            <h1 class="title">Court of Shadows</h1>
+            <p class="subtitle">Un jeu de déduction sociale et d'intrigues</p>
+
+            <div class="form-card">
+                <div class="auth-tabs">
+                    <button class="auth-tab active" data-tab="login">Connexion</button>
+                    <button class="auth-tab" data-tab="register">Inscription</button>
+                </div>
+
+                <div id="login-form" class="auth-form active">
+                    <input type="text" id="login-username" placeholder="Nom d'utilisateur" maxlength="20">
+                    <input type="password" id="login-password" placeholder="Mot de passe" maxlength="50">
+                    <button id="login-btn" class="btn btn-primary">Se connecter</button>
+                </div>
+
+                <div id="register-form" class="auth-form">
+                    <input type="text" id="register-username" placeholder="Nom d'utilisateur" maxlength="20">
+                    <input type="password" id="register-password" placeholder="Mot de passe" maxlength="50">
+                    <input type="password" id="register-password-confirm" placeholder="Confirmer le mot de passe" maxlength="50">
+                    <button id="register-btn" class="btn btn-primary">S'inscrire</button>
+                </div>
+
+                <div id="auth-error" class="auth-error"></div>
+            </div>
         </div>
-        <h1 class="title">Court of Shadows</h1>
-        <p class="subtitle">Un jeu de déduction sociale et d'intrigues</p>
-
-        <div class="form-card">
-            <div class="auth-tabs">
-                <button class="auth-tab active" data-tab="login">Connexion</button>
-                <button class="auth-tab" data-tab="register">Inscription</button>
-            </div>
-
-            <div id="login-form" class="auth-form active">
-                <input type="text" id="login-username" placeholder="Nom d'utilisateur" maxlength="20">
-                <input type="password" id="login-password" placeholder="Mot de passe" maxlength="50">
-                <button id="login-btn" class="btn btn-primary">Se connecter</button>
-            </div>
-
-            <div id="register-form" class="auth-form">
-                <input type="text" id="register-username" placeholder="Nom d'utilisateur" maxlength="20">
-                <input type="password" id="register-password" placeholder="Mot de passe" maxlength="50">
-                <input type="password" id="register-password-confirm" placeholder="Confirmer le mot de passe" maxlength="50">
-                <button id="register-btn" class="btn btn-primary">S'inscrire</button>
-            </div>
-
-            <div id="auth-error" class="auth-error"></div>
+        <div class="auth-logo">
+            <img src="images/logo.png" alt="Court of Shadows">
         </div>
     </div>
 </div>
 
 <!-- Écran de lobby -->
 <div id="lobby-screen" class="screen">
-    <div class="container">
-        <div class="logo-container">
-            <img src="images/logo.png" alt="Court of Shadows">
-        </div>
-        <h1 class="title">Court of Shadows</h1>
+    <div class="lobby-layout">
+        <div class="lobby-content">
+            <div class="lobby-header">
+                <h1 class="title">Court of Shadows</h1>
+                <div class="user-info">
+                    <span>Bienvenue, </span>
+                    <strong id="logged-username">-</strong>
+                    <button id="logout-btn" class="btn-icon" title="Déconnexion">Quitter</button>
+                </div>
+            </div>
 
-        <div class="user-info">
-            <span>Bienvenue, </span>
-            <strong id="logged-username">-</strong>
-            <button id="logout-btn" class="btn-icon" title="Déconnexion">Quitter</button>
-        </div>
-
-        <!-- Grille du lobby -->
-        <div class="lobby-grid">
+            <!-- Grille du lobby -->
+            <div class="lobby-grid">
             <!-- Colonne gauche: Actions -->
             <div class="lobby-column lobby-actions">
                 <!-- Section: Créer une partie -->
@@ -145,64 +148,75 @@
             <button id="show-rules-btn" class="btn btn-secondary btn-full">
                 📜 Consulter les Règles du Jeu
             </button>
-        </div>     
+        </div>
+        </div>
+        <div class="lobby-logo">
+            <img src="images/logo.png" alt="Court of Shadows">
+        </div>
     </div>
 </div>
 
 <!-- Salle d'attente -->
 <div id="waiting-room" class="screen">
-    <div class="container">
-        <h1 class="title"> Salle d'attente</h1>
+    <div class="waiting-layout">
+        <div class="waiting-content">
+            <h1 class="title">Salle d'attente</h1>
 
-        <div class="room-info">
-            <p>Code de la partie : <strong id="display-room-code"></strong></p>
-            <button id="copy-code-btn" class="btn-icon">📋</button>
+            <div class="room-info">
+                <p>Code de la partie : <strong id="display-room-code"></strong></p>
+                <button id="copy-code-btn" class="btn-icon">📋</button>
+            </div>
+
+            <div class="waiting-grid">
+                <div class="players-list">
+                    <h2>Joueurs connectés (<span id="player-count">0</span>)</h2>
+                    <div id="players-container"></div>
+                </div>
+
+                <div id="game-settings" class="game-settings" style="display: none;">
+                    <h3>Paramètres de la partie</h3>
+                    <div class="setting-item">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="setting-conspirators-know-usurper">
+                            <span class="toggle-switch"></span>
+                            <span class="setting-text">Les Conspirateurs connaissent l'Usurpateur</span>
+                        </label>
+                        <p class="setting-hint">Si activé, les conspirateurs verront qui est l'usurpateur</p>
+                    </div>
+                    <div class="setting-item">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="setting-usurper-knows-allies">
+                            <span class="toggle-switch"></span>
+                            <span class="setting-text">L'Usurpateur connaît ses alliés</span>
+                        </label>
+                        <p class="setting-hint">Si activé, l'usurpateur verra qui sont les conspirateurs</p>
+                    </div>
+                    <div class="setting-item" id="setting-limited-knowledge-container" style="display: none;">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="setting-limited-conspirators-knowledge">
+                            <span class="toggle-switch"></span>
+                            <span class="setting-text">Connaissance limitée des Conspirateurs</span>
+                        </label>
+                        <p class="setting-hint">9-10 joueurs uniquement : chaque conspirateur ne connaît qu'un seul allié (chaîne circulaire)</p>
+                    </div>
+                    <div class="setting-item">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="setting-previous-king-cannot-be-chancellor">
+                            <span class="toggle-switch"></span>
+                            <span class="setting-text">Le Roi précédent ne peut être élu Chancelier</span>
+                        </label>
+                        <p class="setting-hint">Si activé, le roi du tour précédent sera inéligible au poste de chancelier</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="waiting-actions">
+                <button id="start-game-btn" class="btn btn-primary" style="display: none;">Démarrer la partie</button>
+                <button id="leave-game-btn" class="btn btn-danger">Quitter</button>
+            </div>
         </div>
-
-        <div class="players-list">
-            <h2>Joueurs connectés (<span id="player-count">0</span>)</h2>
-            <div id="players-container"></div>
-        </div>
-
-        <div id="game-settings" class="game-settings" style="display: none;">
-            <h3>Paramètres de la partie</h3>
-            <div class="setting-item">
-                <label class="toggle-label">
-                    <input type="checkbox" id="setting-conspirators-know-usurper">
-                    <span class="toggle-switch"></span>
-                    <span class="setting-text">Les Conspirateurs connaissent l'Usurpateur</span>
-                </label>
-                <p class="setting-hint">Si activé, les conspirateurs verront qui est l'usurpateur</p>
-            </div>
-            <div class="setting-item">
-                <label class="toggle-label">
-                    <input type="checkbox" id="setting-usurper-knows-allies">
-                    <span class="toggle-switch"></span>
-                    <span class="setting-text">L'Usurpateur connaît ses alliés</span>
-                </label>
-                <p class="setting-hint">Si activé, l'usurpateur verra qui sont les conspirateurs</p>
-            </div>
-            <div class="setting-item" id="setting-limited-knowledge-container" style="display: none;">
-                <label class="toggle-label">
-                    <input type="checkbox" id="setting-limited-conspirators-knowledge">
-                    <span class="toggle-switch"></span>
-                    <span class="setting-text">Connaissance limitée des Conspirateurs</span>
-                </label>
-                <p class="setting-hint">9-10 joueurs uniquement : chaque conspirateur ne connaît qu'un seul allié (chaîne circulaire)</p>
-            </div>
-            <div class="setting-item">
-                <label class="toggle-label">
-                    <input type="checkbox" id="setting-previous-king-cannot-be-chancellor">
-                    <span class="toggle-switch"></span>
-                    <span class="setting-text">Le Roi précédent ne peut être élu Chancelier</span>
-                </label>
-                <p class="setting-hint">Si activé, le roi du tour précédent sera inéligible au poste de chancelier</p>
-            </div>
-        </div>
-
-        <div class="waiting-actions">
-            <button id="start-game-btn" class="btn btn-primary" style="display: none;">Démarrer la partie</button>
-            <button id="leave-game-btn" class="btn btn-danger">Quitter</button>
+        <div class="waiting-logo">
+            <img src="images/logo.png" alt="Court of Shadows">
         </div>
     </div>
 </div>
