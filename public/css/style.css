@@ -254,23 +254,15 @@ body {
    ======================================== */
 
 .sidebar-right {
-    flex: 0 0 40%;
+    flex: 0 0 35%;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 50px;
-    padding: 40px 30px;
-    background: radial-gradient(ellipse at center, rgba(212, 175, 55, 0.08) 0%, transparent 70%),
-                linear-gradient(180deg, var(--bg-primary) 0%, rgba(15, 17, 23, 0.95) 100%);
+    padding: 40px 20px;
+    background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
     min-height: 100vh;
 }
 
-.sidebar-logo img {
-    max-width: 400px;
-    max-height: 50vh;
-    filter: drop-shadow(0 10px 40px rgba(212, 175, 55, 0.3));
-}
 
 .sidebar-ad {
     width: 100%;
@@ -667,6 +659,40 @@ input[type="text"]::placeholder,
 input[type="password"]::placeholder {
     color: var(--text-muted);
     font-style: italic;
+}
+
+/* Password toggle */
+.password-input-wrapper {
+    position: relative;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.password-input-wrapper input {
+    margin-bottom: 0;
+    padding-right: 50px;
+}
+
+.btn-toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    opacity: 0.6;
+    transition: opacity var(--transition-fast);
+    padding: 5px;
+}
+
+.btn-toggle-password:hover {
+    opacity: 1;
+}
+
+.btn-toggle-password.active {
+    opacity: 1;
 }
 
 /* ========================================

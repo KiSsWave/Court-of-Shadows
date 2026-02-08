@@ -408,6 +408,23 @@ class CourtOfShadowsClient {
         document.getElementById('register-password-confirm').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.register();
         });
+
+        // Toggle password visibility
+        document.querySelectorAll('.btn-toggle-password').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetId = btn.dataset.target;
+                const input = document.getElementById(targetId);
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    btn.textContent = '🙈';
+                    btn.classList.add('active');
+                } else {
+                    input.type = 'password';
+                    btn.textContent = '👁️';
+                    btn.classList.remove('active');
+                }
+            });
+        });
     }
 
     switchAuthTab(tab) {

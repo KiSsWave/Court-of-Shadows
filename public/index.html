@@ -27,14 +27,23 @@
 
                 <div id="login-form" class="auth-form active">
                     <input type="text" id="login-username" placeholder="Nom d'utilisateur" maxlength="20">
-                    <input type="password" id="login-password" placeholder="Mot de passe" maxlength="50">
+                    <div class="password-input-wrapper">
+                        <input type="password" id="login-password" placeholder="Mot de passe" maxlength="50">
+                        <button type="button" class="btn-toggle-password" data-target="login-password">👁️</button>
+                    </div>
                     <button id="login-btn" class="btn btn-primary">Se connecter</button>
                 </div>
 
                 <div id="register-form" class="auth-form">
                     <input type="text" id="register-username" placeholder="Nom d'utilisateur" maxlength="20">
-                    <input type="password" id="register-password" placeholder="Mot de passe" maxlength="50">
-                    <input type="password" id="register-password-confirm" placeholder="Confirmer le mot de passe" maxlength="50">
+                    <div class="password-input-wrapper">
+                        <input type="password" id="register-password" placeholder="Mot de passe" maxlength="50">
+                        <button type="button" class="btn-toggle-password" data-target="register-password">👁️</button>
+                    </div>
+                    <div class="password-input-wrapper">
+                        <input type="password" id="register-password-confirm" placeholder="Confirmer le mot de passe" maxlength="50">
+                        <button type="button" class="btn-toggle-password" data-target="register-password-confirm">👁️</button>
+                    </div>
                     <button id="register-btn" class="btn btn-primary">S'inscrire</button>
                 </div>
 
@@ -42,9 +51,6 @@
             </div>
         </div>
         <div class="sidebar-right">
-            <div class="sidebar-logo">
-                <img src="images/logo.png" alt="Court of Shadows">
-            </div>
             <div class="sidebar-ad" id="ad-container-auth">
                 <ins class="adsbygoogle"
                      style="display:block"
@@ -164,9 +170,6 @@
         </div>
         </div>
         <div class="sidebar-right">
-            <div class="sidebar-logo">
-                <img src="images/logo.png" alt="Court of Shadows">
-            </div>
             <div class="sidebar-ad" id="ad-container-lobby">
                 <ins class="adsbygoogle"
                      style="display:block"
@@ -240,9 +243,6 @@
             </div>
         </div>
         <div class="sidebar-right">
-            <div class="sidebar-logo">
-                <img src="images/logo.png" alt="Court of Shadows">
-            </div>
             <div class="sidebar-ad" id="ad-container-waiting">
                 <ins class="adsbygoogle"
                      style="display:block"
