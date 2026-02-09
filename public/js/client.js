@@ -290,9 +290,6 @@ class CourtOfShadowsClient {
         this.latencies = [];
         this.lastPingTime = null;
 
-        // Suivi des joueurs en salle d'attente (pour détecter join/leave)
-        this.previousWaitingPlayers = [];
-
         this.init();
     }
 
@@ -955,6 +952,12 @@ class CourtOfShadowsClient {
                 break;
             case MESSAGE_TYPES.PLAYER_LIST:
                 this.updatePlayerList(message.data);
+                break;
+            case 'player_joined':
+                this.handlePlayerJoined(message.data);
+                break;
+            case 'player_left':
+                this.handlePlayerLeft(message.data);
                 break;
             case MESSAGE_TYPES.GAME_STATE:
                 this.updateGameState(message.data);
@@ -1635,29 +1638,18 @@ class CourtOfShadowsClient {
         this.showNotification('📋 Code de la partie copié !');
     }
 
+    handlePlayerJoined(data) {
+        const { playerName } = data;
+        this.addActivityMessage(`${playerName} a rejoint la partie`, 'join');
+    }
+
+    handlePlayerLeft(data) {
+        const { playerName } = data;
+        this.addActivityMessage(`${playerName} a quitté la partie`, 'leave');
+    }
+
     updatePlayerList(players) {
-        // Détecter les joueurs qui ont rejoint ou quitté
-        if (this.previousWaitingPlayers && this.previousWaitingPlayers.length > 0) {
-            const previousIds = this.previousWaitingPlayers.map(p => p.id);
-            const currentIds = players.map(p => p.id);
-
-            // Joueurs qui ont rejoint
-            players.forEach(player => {
-                if (!previousIds.includes(player.id) && player.id !== this.playerId) {
-                    this.addActivityMessage(`${player.name} a rejoint la partie`, 'join');
-                }
-            });
-
-            // Joueurs qui ont quitté
-            this.previousWaitingPlayers.forEach(player => {
-                if (!currentIds.includes(player.id) && player.id !== this.playerId) {
-                    this.addActivityMessage(`${player.name} a quitté la partie`, 'leave');
-                }
-            });
-        }
-
-        this.previousWaitingPlayers = [...players];
-        this.allPlayers = players; // SAUVEGARDER LA LISTE
+        this.allPlayers = players;
 
         // Mettre à jour le statut d'hôte du joueur actuel
         const currentPlayer = players.find(p => p.id === this.playerId);
@@ -3000,7 +2992,6 @@ class CourtOfShadowsClient {
         if (activityLog) {
             activityLog.innerHTML = '';
         }
-        this.previousWaitingPlayers = [];
     }
 
     showError(message) {

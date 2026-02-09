@@ -438,6 +438,12 @@ wss.on('connection', (ws) => {
                 }
             }));
 
+            // Notifier les autres joueurs qu'un nouveau joueur a rejoint
+            broadcastToGame(roomId, {
+                type: 'player_joined',
+                data: { playerName }
+            }, playerId); // Exclure le joueur qui vient de rejoindre
+
             // Mettre à jour tous les joueurs
             sendPlayerList(roomId);
             sendGameStateToAll(roomId);
@@ -1245,17 +1251,22 @@ wss.on('connection', (ws) => {
             game.removePlayer(targetPlayerId);
             console.log(`${playerName} a quitté la partie ${targetRoomId}`);
 
+            // Nettoyer la connexion AVANT de broadcaster
+            if (connection) {
+                connection.roomId = null;
+            }
+
             if (game.players.size === 0) {
                 gameManager.deleteGame(targetRoomId);
                 console.log(`Partie ${targetRoomId} supprimée (plus de joueurs)`);
             } else {
+                // Notifier les autres joueurs que quelqu'un a quitté
+                broadcastToGame(targetRoomId, {
+                    type: 'player_left',
+                    data: { playerName }
+                });
                 sendPlayerList(targetRoomId);
                 sendGameStateToAll(targetRoomId);
-            }
-
-            // Nettoyer la connexion
-            if (connection) {
-                connection.roomId = null;
             }
 
             // Réinitialiser les variables locales
