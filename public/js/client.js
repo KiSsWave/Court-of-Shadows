@@ -1052,7 +1052,10 @@ class CourtOfShadowsClient {
                 message: data.reason,
                 buttonText: 'OK'
             });
-            window.location.reload();
+            sessionStorage.removeItem('courtOfShadows_roomId');
+            this.roomId = null;
+            this.gameState = null;
+            this.showLobby();
         } else if (data.kickedPlayerName) {
             // Un autre joueur a été kické
             this.showNotification(`👢 ${data.kickedPlayerName} a été exclu de la partie`);
@@ -1068,7 +1071,10 @@ class CourtOfShadowsClient {
                 message: data.reason,
                 buttonText: 'OK'
             });
-            window.location.reload();
+            sessionStorage.removeItem('courtOfShadows_roomId');
+            this.roomId = null;
+            this.gameState = null;
+            this.showLobby();
         } else if (data.bannedPlayerName) {
             // Un autre joueur a été banni
             this.showNotification(`🚫 ${data.bannedPlayerName} a été banni de la partie`);
@@ -1368,14 +1374,18 @@ class CourtOfShadowsClient {
         if (newGameBtn) {
             newGameBtn.addEventListener('click', () => {
                 sessionStorage.removeItem('courtOfShadows_roomId');
-                window.location.reload();
+                this.roomId = null;
+                this.gameState = null;
+                this.showLobby();
             });
         }
 
         if (returnLobbyBtn) {
             returnLobbyBtn.addEventListener('click', () => {
                 sessionStorage.removeItem('courtOfShadows_roomId');
-                window.location.reload();
+                this.roomId = null;
+                this.gameState = null;
+                this.showLobby();
             });
         }
 
@@ -1691,9 +1701,23 @@ class CourtOfShadowsClient {
     }
 
     leaveGame() {
-        // Nettoyer le roomId stocké avant de recharger
+        // Envoyer un message au serveur pour quitter proprement
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+            this.send({
+                type: 'leave_game',
+                playerId: this.playerId,
+                roomId: this.roomId
+            });
+        }
+
+        // Nettoyer l'état local
         sessionStorage.removeItem('courtOfShadows_roomId');
-        window.location.reload();
+        this.roomId = null;
+        this.isHost = false;
+        this.gameState = null;
+
+        // Retourner au lobby
+        this.showLobby();
     }
 
     // === RÉVÉLATION DES RÔLES ===
