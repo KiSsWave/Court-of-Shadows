@@ -270,6 +270,10 @@ wss.on('connection', (ws) => {
                     ws.send(JSON.stringify({ type: 'pong' }));
                     break;
 
+                case 'leave_game':
+                    handleLeaveGame(data);
+                    break;
+
                 default:
                     console.log('Type de message inconnu:', data.type);
             }
@@ -334,6 +338,38 @@ wss.on('connection', (ws) => {
 
     function handleJoinGame(ws, data) {
         const { roomId: requestedRoomId, playerName, username, isPublic, password } = data;
+
+        // Vérifier si le joueur est déjà dans une partie
+        if (username) {
+            for (const [existingPlayerId, connection] of playerConnections.entries()) {
+                if (connection.username === username && connection.roomId) {
+                    // Le joueur est déjà dans une partie, le faire quitter d'abord
+                    const existingGame = gameManager.getGame(connection.roomId);
+                    if (existingGame && existingGame.phase === GAME_PHASES.LOBBY) {
+                        existingGame.removePlayer(existingPlayerId);
+                        console.log(`${playerName} a quitté automatiquement la partie ${connection.roomId}`);
+
+                        if (existingGame.players.size === 0) {
+                            gameManager.deleteGame(connection.roomId);
+                            console.log(`Partie ${connection.roomId} supprimée (plus de joueurs)`);
+                        } else {
+                            sendPlayerList(connection.roomId);
+                            sendGameStateToAll(connection.roomId);
+                        }
+
+                        connection.roomId = null;
+                        playerConnections.delete(existingPlayerId);
+                    } else if (existingGame && existingGame.phase !== GAME_PHASES.LOBBY) {
+                        // Partie en cours, ne pas permettre de créer/rejoindre une autre
+                        ws.send(JSON.stringify({
+                            type: MESSAGE_TYPES.ERROR,
+                            message: 'Vous êtes déjà dans une partie en cours'
+                        }));
+                        return;
+                    }
+                }
+            }
+        }
 
         // Créer ou rejoindre une partie
         roomId = requestedRoomId || generateId();
@@ -1186,6 +1222,46 @@ wss.on('connection', (ws) => {
                 type: MESSAGE_TYPES.ERROR,
                 message: 'Erreur lors de la reconnexion'
             }));
+        }
+    }
+
+    function handleLeaveGame(data) {
+        const { playerId: leavingPlayerId, roomId: leavingRoomId } = data;
+
+        // Utiliser les IDs passés ou les variables locales
+        const targetPlayerId = leavingPlayerId || playerId;
+        const targetRoomId = leavingRoomId || roomId;
+
+        if (!targetPlayerId || !targetRoomId) {
+            console.log('Leave game: playerId ou roomId manquant');
+            return;
+        }
+
+        const game = gameManager.getGame(targetRoomId);
+        const connection = playerConnections.get(targetPlayerId);
+        const playerName = connection ? connection.playerName : null;
+
+        if (game && game.phase === GAME_PHASES.LOBBY) {
+            game.removePlayer(targetPlayerId);
+            console.log(`${playerName} a quitté la partie ${targetRoomId}`);
+
+            if (game.players.size === 0) {
+                gameManager.deleteGame(targetRoomId);
+                console.log(`Partie ${targetRoomId} supprimée (plus de joueurs)`);
+            } else {
+                sendPlayerList(targetRoomId);
+                sendGameStateToAll(targetRoomId);
+            }
+
+            // Nettoyer la connexion
+            if (connection) {
+                connection.roomId = null;
+            }
+
+            // Réinitialiser les variables locales
+            if (targetPlayerId === playerId) {
+                roomId = null;
+            }
         }
     }
 
