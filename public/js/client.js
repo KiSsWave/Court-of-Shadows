@@ -290,6 +290,9 @@ class CourtOfShadowsClient {
         this.latencies = [];
         this.lastPingTime = null;
 
+        // Suivi des joueurs en salle d'attente (pour détecter join/leave)
+        this.previousWaitingPlayers = [];
+
         this.init();
     }
 
@@ -1147,6 +1150,24 @@ class CourtOfShadowsClient {
     initRouter() {
         // Gérer les boutons back/forward du navigateur
         window.addEventListener('popstate', (event) => {
+            const currentScreen = document.querySelector('.screen.active');
+            const currentScreenId = currentScreen ? currentScreen.id : null;
+
+            // Si on quitte la salle d'attente, quitter proprement la partie
+            if (currentScreenId === 'waiting-room' && this.roomId) {
+                // Envoyer un message au serveur pour quitter
+                if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+                    this.send({
+                        type: 'leave_game',
+                        playerId: this.playerId,
+                        roomId: this.roomId
+                    });
+                }
+                sessionStorage.removeItem('courtOfShadows_roomId');
+                this.roomId = null;
+                this.isHost = false;
+            }
+
             if (event.state && event.state.screen) {
                 this.showScreenWithoutPush(event.state.screen);
             } else {
@@ -1544,6 +1565,10 @@ class CourtOfShadowsClient {
         this.showScreen('waiting-room');
         document.getElementById('display-room-code').textContent = this.roomId;
 
+        // Initialiser le log d'activité
+        this.clearActivityLog();
+        this.addActivityMessage('Vous avez rejoint la partie', 'join');
+
         // Afficher les paramètres pour tous les joueurs
         const gameSettings = document.getElementById('game-settings');
         if (gameSettings) {
@@ -1611,6 +1636,27 @@ class CourtOfShadowsClient {
     }
 
     updatePlayerList(players) {
+        // Détecter les joueurs qui ont rejoint ou quitté
+        if (this.previousWaitingPlayers && this.previousWaitingPlayers.length > 0) {
+            const previousIds = this.previousWaitingPlayers.map(p => p.id);
+            const currentIds = players.map(p => p.id);
+
+            // Joueurs qui ont rejoint
+            players.forEach(player => {
+                if (!previousIds.includes(player.id) && player.id !== this.playerId) {
+                    this.addActivityMessage(`${player.name} a rejoint la partie`, 'join');
+                }
+            });
+
+            // Joueurs qui ont quitté
+            this.previousWaitingPlayers.forEach(player => {
+                if (!currentIds.includes(player.id) && player.id !== this.playerId) {
+                    this.addActivityMessage(`${player.name} a quitté la partie`, 'leave');
+                }
+            });
+        }
+
+        this.previousWaitingPlayers = [...players];
         this.allPlayers = players; // SAUVEGARDER LA LISTE
 
         // Mettre à jour le statut d'hôte du joueur actuel
@@ -1625,6 +1671,7 @@ class CourtOfShadowsClient {
             document.getElementById('start-game-btn').style.display = 'block';
             document.getElementById('game-settings').style.display = 'block';
             this.showNotification('👑 Vous êtes maintenant le maître de la partie !');
+            this.addActivityMessage('Vous êtes maintenant le maître de la partie', 'info');
         }
 
         const container = document.getElementById('players-container');
@@ -2928,6 +2975,32 @@ class CourtOfShadowsClient {
             notification.style.animation = 'slideOut 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
             setTimeout(() => notification.remove(), 500);
         }, 3500);
+    }
+
+    addActivityMessage(message, type = 'info') {
+        const activityLog = document.getElementById('activity-log');
+        if (!activityLog) return;
+
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `activity-message ${type}`;
+        messageDiv.innerHTML = `
+            <span>${message}</span>
+            <span class="activity-time">${timeStr}</span>
+        `;
+
+        activityLog.appendChild(messageDiv);
+        activityLog.scrollTop = activityLog.scrollHeight;
+    }
+
+    clearActivityLog() {
+        const activityLog = document.getElementById('activity-log');
+        if (activityLog) {
+            activityLog.innerHTML = '';
+        }
+        this.previousWaitingPlayers = [];
     }
 
     showError(message) {

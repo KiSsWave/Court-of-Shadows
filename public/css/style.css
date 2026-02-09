@@ -279,6 +279,78 @@ body {
     margin-bottom: 20px;
 }
 
+.waiting-left {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.waiting-activity {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+}
+
+.waiting-activity h2 {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    color: var(--text-primary);
+}
+
+#activity-log {
+    flex: 1;
+    max-height: 300px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.activity-message {
+    padding: 10px 15px;
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+    animation: slideInActivity 0.3s ease;
+}
+
+.activity-message.join {
+    background: rgba(37, 99, 235, 0.15);
+    border-left: 3px solid var(--primary);
+    color: var(--primary-light);
+}
+
+.activity-message.leave {
+    background: rgba(239, 68, 68, 0.15);
+    border-left: 3px solid var(--danger);
+    color: #f87171;
+}
+
+.activity-message.info {
+    background: rgba(212, 175, 55, 0.15);
+    border-left: 3px solid var(--gold);
+    color: var(--gold);
+}
+
+.activity-message .activity-time {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-left: 10px;
+}
+
+@keyframes slideInActivity {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
 
 /* ========================================
    LAYOUT LOBBY
@@ -2270,6 +2342,14 @@ input[type="password"]::placeholder {
     .waiting-grid {
         grid-template-columns: 1fr;
         gap: 15px;
+    }
+
+    .waiting-activity {
+        order: -1;
+    }
+
+    #activity-log {
+        max-height: 150px;
     }
 
     /* Lobby layout mobile */

@@ -168,17 +168,18 @@
             <h1 class="title">Salle d'attente</h1>
 
             <div class="room-info">
-                <p>Code de la partie : <strong id="display-room-code"></strong></p>
-                <button id="copy-code-btn" class="btn-icon">📋</button>
+                <span>Code de la partie : <strong id="display-room-code"></strong></span>
+                <button id="copy-code-btn" class="btn-icon" title="Copier le code">📋</button>
             </div>
 
             <div class="waiting-grid">
-                <div class="players-list">
-                    <h2>Joueurs connectés (<span id="player-count">0</span>)</h2>
-                    <div id="players-container"></div>
-                </div>
+                <div class="waiting-left">
+                    <div class="players-list">
+                        <h2>Joueurs connectés (<span id="player-count">0</span>)</h2>
+                        <div id="players-container"></div>
+                    </div>
 
-                <div id="game-settings" class="game-settings" style="display: none;">
+                    <div id="game-settings" class="game-settings" style="display: none;">
                     <h3>Paramètres de la partie</h3>
                     <div class="setting-item">
                         <label class="toggle-label">
@@ -212,6 +213,12 @@
                         </label>
                         <p class="setting-hint">Si activé, le roi du tour précédent sera inéligible au poste de chancelier</p>
                     </div>
+                </div>
+                </div>
+
+                <div class="waiting-activity">
+                    <h2>📢 Activité</h2>
+                    <div id="activity-log"></div>
                 </div>
             </div>
 
