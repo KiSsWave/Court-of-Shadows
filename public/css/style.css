@@ -329,6 +329,40 @@ body {
     border: 1px solid var(--border);
 }
 
+.room-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding: 20px 30px;
+    margin-bottom: 20px;
+}
+
+.room-info span {
+    font-size: 1.1rem;
+}
+
+.room-info strong {
+    color: var(--gold);
+    font-size: 1.3rem;
+    letter-spacing: 2px;
+}
+
+.room-info .btn-icon {
+    padding: 8px 12px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.room-info .btn-icon:hover {
+    background: var(--surface-hover);
+    border-color: var(--primary);
+}
+
 /* ========================================
    LOBBY - GRILLE PC/MOBILE
    ======================================== */

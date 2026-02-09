@@ -1607,11 +1607,7 @@ class CourtOfShadowsClient {
 
     copyRoomCode() {
         navigator.clipboard.writeText(this.roomId);
-        const btn = document.getElementById('copy-code-btn');
-        btn.textContent = '✅';
-        setTimeout(() => {
-            btn.textContent = '📋';
-        }, 2000);
+        this.showNotification('📋 Code de la partie copié !');
     }
 
     updatePlayerList(players) {
