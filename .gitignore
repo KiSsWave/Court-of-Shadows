@@ -1,10 +1,20 @@
-users.json
-node_modules
-npm-debug.log
-.git
-.gitignore
-.idea
-*.md
+# Dependencies
+node_modules/
+
+# Environment
 .env
+
+# IDE
+.idea/
+.vscode/
+
+# OS
 .DS_Store
+
+# Logs
+npm-debug.log
+*.log
+
+# Secrets
 key.json
+users.json

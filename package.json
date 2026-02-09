@@ -13,7 +13,7 @@
     "social-deduction",
     "multiplayer"
   ],
-  "author": "",
+  "author": "KiSsWave",
   "license": "MIT",
   "dependencies": {
     "bcrypt": "^5.1.1",
