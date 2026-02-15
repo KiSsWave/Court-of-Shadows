@@ -12,39 +12,48 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3937918810340332" crossorigin="anonymous"></script>
 </head>
 <body>
+<!-- Sélecteur de langue global -->
+<div class="language-selector">
+    <select id="lang-select" title="Language">
+        <option value="fr">FR</option>
+        <option value="en">EN</option>
+        <option value="es">ES</option>
+    </select>
+</div>
+
 <!-- Écran d'authentification -->
 <div id="auth-screen" class="screen active">
     <div class="auth-layout">
         <div class="auth-content">
-            <h1 class="title">Court of Shadows</h1>
-            <p class="subtitle">Un jeu de déduction sociale et d'intrigues</p>
+            <h1 class="title" data-i18n="lobby.title">Court of Shadows</h1>
+            <p class="subtitle" data-i18n="lobby.subtitle">Un jeu de déduction sociale et d'intrigues</p>
 
             <div class="form-card">
                 <div class="auth-tabs">
-                    <button class="auth-tab active" data-tab="login">Connexion</button>
-                    <button class="auth-tab" data-tab="register">Inscription</button>
+                    <button class="auth-tab active" data-tab="login" data-i18n="auth.login">Connexion</button>
+                    <button class="auth-tab" data-tab="register" data-i18n="auth.register">Inscription</button>
                 </div>
 
                 <div id="login-form" class="auth-form active">
-                    <input type="text" id="login-username" placeholder="Nom d'utilisateur" maxlength="20">
+                    <input type="text" id="login-username" data-i18n-placeholder="auth.username" placeholder="Nom d'utilisateur" maxlength="20">
                     <div class="password-input-wrapper">
-                        <input type="password" id="login-password" placeholder="Mot de passe" maxlength="50">
+                        <input type="password" id="login-password" data-i18n-placeholder="auth.password" placeholder="Mot de passe" maxlength="50">
                         <button type="button" class="btn-toggle-password" data-target="login-password">👁️</button>
                     </div>
-                    <button id="login-btn" class="btn btn-primary">Se connecter</button>
+                    <button id="login-btn" class="btn btn-primary" data-i18n="auth.loginButton">Se connecter</button>
                 </div>
 
                 <div id="register-form" class="auth-form">
-                    <input type="text" id="register-username" placeholder="Nom d'utilisateur" maxlength="20">
+                    <input type="text" id="register-username" data-i18n-placeholder="auth.username" placeholder="Nom d'utilisateur" maxlength="20">
                     <div class="password-input-wrapper">
-                        <input type="password" id="register-password" placeholder="Mot de passe" maxlength="50">
+                        <input type="password" id="register-password" data-i18n-placeholder="auth.password" placeholder="Mot de passe" maxlength="50">
                         <button type="button" class="btn-toggle-password" data-target="register-password">👁️</button>
                     </div>
                     <div class="password-input-wrapper">
-                        <input type="password" id="register-password-confirm" placeholder="Confirmer le mot de passe" maxlength="50">
+                        <input type="password" id="register-password-confirm" data-i18n-placeholder="auth.confirmPassword" placeholder="Confirmer le mot de passe" maxlength="50">
                         <button type="button" class="btn-toggle-password" data-target="register-password-confirm">👁️</button>
                     </div>
-                    <button id="register-btn" class="btn btn-primary">S'inscrire</button>
+                    <button id="register-btn" class="btn btn-primary" data-i18n="auth.registerButton">S'inscrire</button>
                 </div>
 
                 <div id="auth-error" class="auth-error"></div>
@@ -58,11 +67,11 @@
     <div class="lobby-layout">
         <div class="lobby-content">
             <div class="lobby-header">
-                <h1 class="title">Court of Shadows</h1>
+                <h1 class="title" data-i18n="lobby.title">Court of Shadows</h1>
                 <div class="user-info">
-                    <span>Bienvenue, </span>
+                    <span data-i18n="lobby.welcome">Bienvenue,</span>
                     <strong id="logged-username">-</strong>
-                    <button id="logout-btn" class="btn-icon" title="Déconnexion">Quitter</button>
+                    <button id="logout-btn" class="btn-icon" data-i18n-title="auth.logout" title="Déconnexion" data-i18n="auth.logout">Quitter</button>
                 </div>
             </div>
 
@@ -72,23 +81,23 @@
             <div class="lobby-column lobby-actions">
                 <!-- Section: Créer une partie -->
                 <div class="form-card">
-                    <h2>🎮 Créer une Partie</h2>
+                    <h2>🎮 <span data-i18n="lobby.createGame">Créer une Partie</span></h2>
 
                     <div class="create-game-options">
                         <div class="game-type-selector">
                             <button class="game-type-btn active" data-type="public">
-                                🌐 Publique
+                                🌐 <span data-i18n="lobby.public">Publique</span>
                             </button>
                             <button class="game-type-btn" data-type="private">
-                                🔒 Privée
+                                🔒 <span data-i18n="lobby.private">Privée</span>
                             </button>
                         </div>
 
                         <div id="private-password-field" class="private-password-field">
-                            <input type="password" id="game-password" placeholder="Mot de passe de la partie" maxlength="20">
+                            <input type="password" id="game-password" data-i18n-placeholder="lobby.gamePassword" placeholder="Mot de passe de la partie" maxlength="20">
                         </div>
 
-                        <button id="create-game-btn" class="btn btn-primary btn-full">
+                        <button id="create-game-btn" class="btn btn-primary btn-full" data-i18n="lobby.createButton">
                             Créer la Partie
                         </button>
                     </div>
@@ -96,21 +105,21 @@
 
                 <!-- Section: Rejoindre avec code -->
                 <div class="form-card">
-                    <h2>🔑 Rejoindre avec Code</h2>
+                    <h2>🔑 <span data-i18n="lobby.joinWithCode">Rejoindre avec Code</span></h2>
 
                     <div class="join-game-form">
                         <div class="input-group">
-                            <label for="room-code" class="input-label">Code de la partie</label>
-                            <input type="text" id="room-code" placeholder="Ex: ABC123" maxlength="10" class="input-with-icon">
+                            <label for="room-code" class="input-label" data-i18n="lobby.roomCode">Code de la partie</label>
+                            <input type="text" id="room-code" data-i18n-placeholder="lobby.roomCodePlaceholder" placeholder="Ex: ABC123" maxlength="10" class="input-with-icon">
                         </div>
 
                         <div class="input-group">
-                            <label for="join-password" class="input-label">Mot de passe (optionnel)</label>
-                            <input type="password" id="join-password" placeholder="Si partie privée..." maxlength="20">
+                            <label for="join-password" class="input-label" data-i18n="lobby.passwordOptional">Mot de passe (optionnel)</label>
+                            <input type="password" id="join-password" data-i18n-placeholder="lobby.passwordIfPrivate" placeholder="Si partie privée..." maxlength="20">
                         </div>
 
                         <button id="join-game-btn" class="btn btn-primary btn-full">
-                            🚪 Rejoindre la Partie
+                            🚪 <span data-i18n="lobby.joinButton">Rejoindre la Partie</span>
                         </button>
                     </div>
                 </div>
@@ -118,7 +127,7 @@
                 <!-- Bouton règles (visible sur mobile uniquement dans cette colonne) -->
                 <div class="form-card lobby-rules-mobile">
                     <button id="show-rules-btn-mobile" class="btn btn-secondary btn-full">
-                        📜 Consulter les Règles
+                        📜 <span data-i18n="lobby.viewRules">Consulter les Règles</span>
                     </button>
                 </div>
             </div>
@@ -128,24 +137,24 @@
                 <!-- Section: Parties publiques -->
                 <div class="form-card">
                     <div class="card-header">
-                        <h2>🌍 Parties Publiques</h2>
-                        <button id="refresh-public-games" class="btn-icon-small" title="Actualiser">🔄</button>
+                        <h2>🌍 <span data-i18n="lobby.publicGames">Parties Publiques</span></h2>
+                        <button id="refresh-public-games" class="btn-icon-small" data-i18n-title="lobby.refresh" title="Actualiser">🔄</button>
                     </div>
 
                     <div id="public-games-list" class="games-list">
-                        <p class="games-list-empty">Chargement...</p>
+                        <p class="games-list-empty" data-i18n="common.loading">Chargement...</p>
                     </div>
                 </div>
 
                 <!-- Section: Mes parties en cours -->
                 <div class="form-card">
                     <div class="card-header">
-                        <h2>📋 Mes Parties en Cours</h2>
-                        <button id="refresh-my-games" class="btn-icon-small" title="Actualiser">🔄</button>
+                        <h2>📋 <span data-i18n="lobby.myGames">Mes Parties en Cours</span></h2>
+                        <button id="refresh-my-games" class="btn-icon-small" data-i18n-title="lobby.refresh" title="Actualiser">🔄</button>
                     </div>
 
                     <div id="my-games-list" class="games-list">
-                        <p class="games-list-empty">Aucune partie en cours</p>
+                        <p class="games-list-empty" data-i18n="lobby.noMyGames">Aucune partie en cours</p>
                     </div>
                 </div>
             </div>
@@ -154,7 +163,7 @@
         <!-- Bouton règles (pleine largeur sur PC) -->
         <div class="lobby-rules-desktop">
             <button id="show-rules-btn" class="btn btn-secondary btn-full">
-                📜 Consulter les Règles du Jeu
+                📜 <span data-i18n="lobby.viewRules">Consulter les Règles du Jeu</span>
             </button>
         </div>
         </div>
@@ -165,66 +174,66 @@
 <div id="waiting-room" class="screen">
     <div class="waiting-layout">
         <div class="waiting-content">
-            <h1 class="title">Salle d'attente</h1>
+            <h1 class="title" data-i18n="waiting.title">Salle d'attente</h1>
 
             <div class="room-info">
-                <span>Code de la partie : <strong id="display-room-code"></strong></span>
-                <button id="copy-code-btn" class="btn-icon" title="Copier le code">📋</button>
+                <span><span data-i18n="waiting.roomCode">Code de la partie :</span> <strong id="display-room-code"></strong></span>
+                <button id="copy-code-btn" class="btn-icon" data-i18n-title="waiting.copyCode" title="Copier le code">📋</button>
             </div>
 
             <div class="waiting-grid">
                 <div class="waiting-left">
                     <div class="players-list">
-                        <h2>Joueurs connectés (<span id="player-count">0</span>)</h2>
+                        <h2><span data-i18n="waiting.playersConnected">Joueurs connectés</span> (<span id="player-count">0</span>)</h2>
                         <div id="players-container"></div>
                     </div>
 
                     <div id="game-settings" class="game-settings" style="display: none;">
-                    <h3>Paramètres de la partie</h3>
+                    <h3 data-i18n="settings.title">Paramètres de la partie</h3>
                     <div class="setting-item">
                         <label class="toggle-label">
                             <input type="checkbox" id="setting-conspirators-know-usurper">
                             <span class="toggle-switch"></span>
-                            <span class="setting-text">Les Conspirateurs connaissent l'Usurpateur</span>
+                            <span class="setting-text" data-i18n="settings.conspiratorsKnowUsurper">Les Conspirateurs connaissent l'Usurpateur</span>
                         </label>
-                        <p class="setting-hint">Si activé, les conspirateurs verront qui est l'usurpateur</p>
+                        <p class="setting-hint" data-i18n="settings.conspiratorsKnowUsurperHint">Si activé, les conspirateurs verront qui est l'usurpateur</p>
                     </div>
                     <div class="setting-item">
                         <label class="toggle-label">
                             <input type="checkbox" id="setting-usurper-knows-allies">
                             <span class="toggle-switch"></span>
-                            <span class="setting-text">L'Usurpateur connaît ses alliés</span>
+                            <span class="setting-text" data-i18n="settings.usurperKnowsAllies">L'Usurpateur connaît ses alliés</span>
                         </label>
-                        <p class="setting-hint">Si activé, l'usurpateur verra qui sont les conspirateurs</p>
+                        <p class="setting-hint" data-i18n="settings.usurperKnowsAlliesHint">Si activé, l'usurpateur verra qui sont les conspirateurs</p>
                     </div>
                     <div class="setting-item" id="setting-limited-knowledge-container" style="display: none;">
                         <label class="toggle-label">
                             <input type="checkbox" id="setting-limited-conspirators-knowledge">
                             <span class="toggle-switch"></span>
-                            <span class="setting-text">Connaissance limitée des Conspirateurs</span>
+                            <span class="setting-text" data-i18n="settings.limitedKnowledge">Connaissance limitée des Conspirateurs</span>
                         </label>
-                        <p class="setting-hint">9-10 joueurs uniquement : chaque conspirateur ne connaît qu'un seul allié (chaîne circulaire)</p>
+                        <p class="setting-hint" data-i18n="settings.limitedKnowledgeHint">9-10 joueurs uniquement : chaque conspirateur ne connaît qu'un seul allié (chaîne circulaire)</p>
                     </div>
                     <div class="setting-item">
                         <label class="toggle-label">
                             <input type="checkbox" id="setting-previous-king-cannot-be-chancellor">
                             <span class="toggle-switch"></span>
-                            <span class="setting-text">Le Roi précédent ne peut être élu Chancelier</span>
+                            <span class="setting-text" data-i18n="settings.previousKingRestriction">Le Roi précédent ne peut être élu Chancelier</span>
                         </label>
-                        <p class="setting-hint">Si activé, le roi du tour précédent sera inéligible au poste de chancelier</p>
+                        <p class="setting-hint" data-i18n="settings.previousKingRestrictionHint">Si activé, le roi du tour précédent sera inéligible au poste de chancelier</p>
                     </div>
                 </div>
                 </div>
 
                 <div class="waiting-activity">
-                    <h2>📢 Activité</h2>
+                    <h2>📢 <span data-i18n="waiting.activity">Activité</span></h2>
                     <div id="activity-log"></div>
                 </div>
             </div>
 
             <div class="waiting-actions">
-                <button id="start-game-btn" class="btn btn-primary" style="display: none;">Démarrer la partie</button>
-                <button id="leave-game-btn" class="btn btn-danger">Quitter</button>
+                <button id="start-game-btn" class="btn btn-primary" style="display: none;" data-i18n="waiting.startGame">Démarrer la partie</button>
+                <button id="leave-game-btn" class="btn btn-danger" data-i18n="waiting.leave">Quitter</button>
             </div>
         </div>
     </div>
@@ -254,21 +263,21 @@
                     <div class="deck-item draw-pile">
                         <img src="images/logo.png" alt="Pioche" class="deck-card-img">
                         <span class="deck-count" id="deck-count">17</span>
-                        <span class="deck-label">Pioche</span>
+                        <span class="deck-label" data-i18n="game.drawPile">Pioche</span>
                     </div>
                     <div class="deck-item discard-pile">
                         <div class="discard-placeholder"></div>
                         <span class="deck-count" id="discard-count">0</span>
-                        <span class="deck-label">Défausse</span>
+                        <span class="deck-label" data-i18n="game.discardPile">Défausse</span>
                     </div>
                 </div>
                 <div class="scores-container">
                     <div class="score-item loyalists">
-                        <span class="label">Édits Royaux</span>
+                        <span class="label" data-i18n="game.royalEdicts">Édits Royaux</span>
                         <span class="count" id="edits-count">0</span>/5
                     </div>
                     <div class="score-item conspirators">
-                        <span class="label">Complots</span>
+                        <span class="label" data-i18n="game.plots">Complots</span>
                         <span class="count" id="plots-count">0</span>/6
                     </div>
                 </div>
@@ -283,11 +292,11 @@
                     <span class="player-name-label" id="game-player-name">-</span>
                 </div>
                 <div class="player-role-display" id="player-role-display">
-                    <span class="role-label">Rôle :</span>
+                    <span class="role-label" data-i18n="roles.role">Rôle :</span>
                     <span class="role-value" id="your-role-value">-</span>
                 </div>
                 <div class="deadlock-counter">
-                    <span>Impasse : </span>
+                    <span data-i18n="game.deadlock">Impasse :</span>
                     <span id="deadlock-count">0</span>/3
                 </div>
                 <div class="connection-quality" id="connection-quality" title="Qualité de connexion">
@@ -362,7 +371,7 @@
 
         <div class="game-main">
             <div class="game-players" id="players-section">
-                <h3>👥 Joueurs</h3>
+                <h3>👥 <span data-i18n="game.players">Joueurs</span></h3>
                 <div id="game-players-list"></div>
             </div>
 
@@ -372,16 +381,16 @@
 
             <div class="game-chat" id="chat-section">
                 <button class="section-toggle" id="toggle-chat">
-                    <span>💬 Discussion</span>
+                    <span>💬 <span data-i18n="game.discussion">Discussion</span></span>
                     <span class="toggle-icon">▼</span>
                 </button>
-                <h3>💬 Discussion</h3>
+                <h3>💬 <span data-i18n="game.discussion">Discussion</span></h3>
                 <div class="section-content">
                     <div id="chat-messages"></div>
                     <div id="share-cards-container"></div>
                     <div class="chat-input">
-                        <input type="text" id="chat-input" placeholder="Votre message...">
-                        <button id="send-chat-btn">Envoyer</button>
+                        <input type="text" id="chat-input" data-i18n-placeholder="game.yourMessage" placeholder="Votre message...">
+                        <button id="send-chat-btn" data-i18n="common.send">Envoyer</button>
                     </div>
                 </div>
             </div>
@@ -397,8 +406,8 @@
             <p id="winner-reason"></p>
             <div id="final-roles-container" class="final-roles-container"></div>
             <div class="game-over-actions">
-                <button id="new-game-btn" class="btn btn-primary">Nouvelle partie</button>
-                <button id="return-lobby-btn" class="btn btn-secondary">Retour au lobby</button>
+                <button id="new-game-btn" class="btn btn-primary" data-i18n="gameOver.newGame">Nouvelle partie</button>
+                <button id="return-lobby-btn" class="btn btn-secondary" data-i18n="gameOver.returnToLobby">Retour au lobby</button>
             </div>
         </div>
     </div>
@@ -407,9 +416,9 @@
 <!-- Écran des Règles -->
 <div id="rules-screen" class="screen">
     <div class="container">
-        <button id="back-from-rules-btn" class="btn btn-secondary btn-back">← Retour</button>
-        <h1 class="title">Règles du Jeu</h1>
-        <p class="subtitle">Un jeu d'intrigue et de trahison pour 5 à 10 joueurs</p>
+        <button id="back-from-rules-btn" class="btn btn-secondary btn-back">← <span data-i18n="common.back">Retour</span></button>
+        <h1 class="title" data-i18n="rules.title">Règles du Jeu</h1>
+        <p class="subtitle" data-i18n="rules.subtitle">Un jeu d'intrigue et de trahison pour 5 à 10 joueurs</p>
         
         <div class="form-card rules-content">
             <!-- Introduction -->
@@ -745,11 +754,11 @@
 <div id="confirm-popup" class="confirm-popup-overlay" style="display: none;">
     <div class="confirm-popup">
         <div class="confirm-popup-icon" id="confirm-popup-icon">⚠️</div>
-        <h3 class="confirm-popup-title" id="confirm-popup-title">Confirmation</h3>
-        <p class="confirm-popup-message" id="confirm-popup-message">Êtes-vous sûr ?</p>
+        <h3 class="confirm-popup-title" id="confirm-popup-title" data-i18n="common.confirm">Confirmation</h3>
+        <p class="confirm-popup-message" id="confirm-popup-message"></p>
         <div class="confirm-popup-buttons">
-            <button id="confirm-popup-cancel" class="btn btn-secondary">Annuler</button>
-            <button id="confirm-popup-confirm" class="btn btn-danger">Confirmer</button>
+            <button id="confirm-popup-cancel" class="btn btn-secondary" data-i18n="common.cancel">Annuler</button>
+            <button id="confirm-popup-confirm" class="btn btn-danger" data-i18n="common.confirm">Confirmer</button>
         </div>
     </div>
 </div>
@@ -758,15 +767,15 @@
 <div id="game-settings-popup" class="settings-popup-overlay" style="display: none;">
     <div class="settings-popup">
         <div class="settings-popup-header">
-            <h3>⚙️ Paramètres de la partie</h3>
+            <h3>⚙️ <span data-i18n="hostActions.settingsTitle">Paramètres de la partie</span></h3>
             <button id="close-settings-popup" class="btn-close-settings">&times;</button>
         </div>
         <div class="settings-popup-content">
             <button id="settings-pause-btn" class="btn btn-secondary btn-full">
-                <span class="btn-icon-left">⏸️</span> Mettre en pause
+                <span class="btn-icon-left">⏸️</span> <span data-i18n="hostActions.pause">Mettre en pause</span>
             </button>
             <button id="settings-stop-btn" class="btn btn-danger btn-full">
-                <span class="btn-icon-left">🛑</span> Arrêter la partie
+                <span class="btn-icon-left">🛑</span> <span data-i18n="hostActions.stopGame">Arrêter la partie</span>
             </button>
         </div>
     </div>
@@ -778,8 +787,15 @@
     <span class="footer-credit">Créé par KiSsWave</span>
 </footer>
 
+<script src="js/i18n.js"></script>
 <script src="js/boards.js"></script>
 <script src="js/constants.js"></script>
 <script src="js/client.js"></script>
+<script>
+    // Initialiser le système i18n au chargement de la page
+    document.addEventListener('DOMContentLoaded', () => {
+        i18n.init();
+    });
+</script>
 </body>
 </html>

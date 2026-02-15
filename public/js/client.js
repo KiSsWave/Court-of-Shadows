@@ -437,8 +437,10 @@ class CourtOfShadowsClient {
         this.hideAuthError();
     }
 
-    showAuthError(message) {
+    showAuthError(messageKey, params = {}) {
         const errorDiv = document.getElementById('auth-error');
+        // Si c'est une clé de traduction, on traduit, sinon on affiche le message brut
+        const message = messageKey.includes('.') ? t(messageKey, params) : messageKey;
         errorDiv.textContent = message;
         errorDiv.classList.add('visible');
     }
@@ -475,7 +477,7 @@ class CourtOfShadowsClient {
         const password = document.getElementById('login-password').value;
 
         if (!username || !password) {
-            this.showAuthError('Veuillez remplir tous les champs');
+            this.showAuthError('auth.fillAllFields');
             return;
         }
 
@@ -490,12 +492,12 @@ class CourtOfShadowsClient {
         const passwordConfirm = document.getElementById('register-password-confirm').value;
 
         if (!username || !password || !passwordConfirm) {
-            this.showAuthError('Veuillez remplir tous les champs');
+            this.showAuthError('auth.fillAllFields');
             return;
         }
 
         if (password !== passwordConfirm) {
-            this.showAuthError('Les mots de passe ne correspondent pas');
+            this.showAuthError('auth.passwordMismatch');
             return;
         }
 
@@ -530,7 +532,7 @@ class CourtOfShadowsClient {
                 this.isAuthenticated = false;
                 this.wasInGame = false;
                 this.showScreen('auth-screen');
-                this.showAuthError('Session expirée, veuillez vous reconnecter');
+                this.showAuthError('auth.sessionExpired');
             } else {
                 this.showAuthError(data.error);
             }
@@ -630,7 +632,7 @@ class CourtOfShadowsClient {
                 </div>
             </div>
             <div class="game-actions">
-                <button class="btn btn-primary btn-small">Rejoindre</button>
+                <button class="btn btn-primary btn-small">${t('lobby.join')}</button>
             </div>
         `;
 
@@ -686,7 +688,7 @@ class CourtOfShadowsClient {
                 <div class="game-details">
                     <div class="game-detail-item">
                         <span>👥</span>
-                        <span>${game.playerCount} joueurs</span>
+                        <span>${game.playerCount} ${t('lobby.players')}</span>
                     </div>
                     <div class="game-detail-item">
                         <span>📍</span>
@@ -700,7 +702,7 @@ class CourtOfShadowsClient {
                 </div>
             </div>
             <div class="game-actions">
-                <button class="btn btn-warning btn-small">Reconnecter</button>
+                <button class="btn btn-warning btn-small">${t('lobby.reconnect')}</button>
             </div>
         `;
 
@@ -738,10 +740,11 @@ class CourtOfShadowsClient {
         const hours = Math.floor(minutes / 60);
         const days = Math.floor(hours / 24);
 
-        if (days > 0) return `Il y a ${days}j`;
-        if (hours > 0) return `Il y a ${hours}h`;
-        if (minutes > 0) return `Il y a ${minutes}min`;
-        return 'À l\'instant';
+        const ago = t('lobby.ago');
+        if (days > 0) return `${ago} ${t('time.days', { n: days })}`;
+        if (hours > 0) return `${ago} ${t('time.hours', { n: hours })}`;
+        if (minutes > 0) return `${ago} ${t('time.minutes', { n: minutes })}`;
+        return t('lobby.justNow');
     }
 
     // === CONNEXION WEBSOCKET ===
@@ -1635,17 +1638,17 @@ class CourtOfShadowsClient {
 
     copyRoomCode() {
         navigator.clipboard.writeText(this.roomId);
-        this.showNotification('📋 Code de la partie copié !');
+        this.showNotification(`📋 ${t('waiting.codeCopied')}`);
     }
 
     handlePlayerJoined(data) {
         const { playerName } = data;
-        this.addActivityMessage(`${playerName} a rejoint la partie`, 'join');
+        this.addActivityMessage(t('waiting.playerJoined', { player: playerName }), 'join');
     }
 
     handlePlayerLeft(data) {
         const { playerName } = data;
-        this.addActivityMessage(`${playerName} a quitté la partie`, 'leave');
+        this.addActivityMessage(t('waiting.playerLeft', { player: playerName }), 'leave');
     }
 
     updatePlayerList(players) {
@@ -1662,8 +1665,8 @@ class CourtOfShadowsClient {
         if (!wasHost && this.isHost) {
             document.getElementById('start-game-btn').style.display = 'block';
             document.getElementById('game-settings').style.display = 'block';
-            this.showNotification('👑 Vous êtes maintenant le maître de la partie !');
-            this.addActivityMessage('Vous êtes maintenant le maître de la partie', 'info');
+            this.showNotification(`👑 ${t('waiting.youAreHost')}`);
+            this.addActivityMessage(t('waiting.youAreHost'), 'info');
         }
 
         const container = document.getElementById('players-container');
@@ -1684,8 +1687,8 @@ class CourtOfShadowsClient {
                 <div class="player-card-name">${player.name}</div>
                 ${showActions ? `
                     <div class="player-card-actions">
-                        <button class="btn-kick" data-player-id="${player.id}" title="Exclure">👢 Kick</button>
-                        <button class="btn-ban" data-player-id="${player.id}" title="Bannir">🚫 Ban</button>
+                        <button class="btn-kick" data-player-id="${player.id}" title="${t('waiting.kick')}">👢 ${t('waiting.kick')}</button>
+                        <button class="btn-ban" data-player-id="${player.id}" title="${t('waiting.ban')}">🚫 ${t('waiting.ban')}</button>
                     </div>
                 ` : ''}
             `;
@@ -1787,18 +1790,18 @@ class CourtOfShadowsClient {
         if (data.role === ROLES.USURPER) {
             roleCard.className = 'role-card conspirator';
             roleIcon.textContent = '👑💀';
-            roleTitle.textContent = 'L\'USURPATEUR';
-            roleDesc.textContent = 'Vous êtes le chef secret des conspirateurs. Devenez Chancelier après 3 Complots pour gagner !';
+            roleTitle.textContent = t('roles.usurperTitle');
+            roleDesc.textContent = t('roles.usurperDesc');
         } else if (data.role === ROLES.CONSPIRATOR) {
             roleCard.className = 'role-card conspirator';
             roleIcon.textContent = '🗡️';
-            roleTitle.textContent = 'CONSPIRATEUR';
-            roleDesc.textContent = 'Votez des Complots et protégez l\'Usurpateur. 6 Complots = Victoire !';
+            roleTitle.textContent = t('roles.conspiratorTitle');
+            roleDesc.textContent = t('roles.conspiratorDesc');
         } else {
             roleCard.className = 'role-card loyalist';
             roleIcon.textContent = '⚜️';
-            roleTitle.textContent = 'LOYALISTE';
-            roleDesc.textContent = 'Votez des Édits Royaux et trouvez l\'Usurpateur. 5 Édits = Victoire !';
+            roleTitle.textContent = t('roles.loyalistTitle');
+            roleDesc.textContent = t('roles.loyalistDesc');
         }
 
         // Afficher les alliés si présents et les ajouter aux joueurs connus
@@ -1814,7 +1817,7 @@ class CourtOfShadowsClient {
             alliesInfo.className = 'allies-info';
             alliesInfo.style.cssText = 'margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 10px; border: 1px solid rgba(212, 175, 55, 0.5);';
 
-            const alliesTitle = data.role === ROLES.USURPER ? 'Vos alliés conspirateurs :' : 'L\'Usurpateur est :';
+            const alliesTitle = data.role === ROLES.USURPER ? t('roles.yourAllies') : t('roles.theUsurperIs');
             const alliesNames = data.allies.map(a => `<strong style="color: #ff6b6b;">${a.name}</strong>`).join(', ');
 
             alliesInfo.innerHTML = `
@@ -2033,9 +2036,9 @@ class CourtOfShadowsClient {
         roleDisplay.classList.remove('loyalist', 'conspirator', 'usurper');
 
         const roleNames = {
-            [ROLES.USURPER]: 'Usurpateur',
-            [ROLES.CONSPIRATOR]: 'Conspirateur',
-            [ROLES.LOYALIST]: 'Loyaliste'
+            [ROLES.USURPER]: t('roles.usurper'),
+            [ROLES.CONSPIRATOR]: t('roles.conspirator'),
+            [ROLES.LOYALIST]: t('roles.loyalist')
         };
 
         roleValue.textContent = roleNames[this.playerRole] || this.playerRole;
@@ -2098,12 +2101,12 @@ class CourtOfShadowsClient {
         const phaseElement = document.getElementById('current-phase');
 
         const phaseNames = {
-            [GAME_PHASES.NOMINATION]: '🏛️ Nomination du Chancelier',
-            [GAME_PHASES.COUNCIL_VOTE]: '🗳️ Vote du Conseil',
-            [GAME_PHASES.LEGISLATIVE]: '📜 Session Législative',
-            [GAME_PHASES.EXECUTIVE_POWER]: '⚡ Pouvoir Exécutif',
-            [GAME_PHASES.DEBATE]: '💬 Débat de la Cour',
-            [GAME_PHASES.PAUSED]: '⏸️ Partie en Pause'
+            [GAME_PHASES.NOMINATION]: `🏛️ ${t('phases.nomination')}`,
+            [GAME_PHASES.COUNCIL_VOTE]: `🗳️ ${t('phases.councilVote')}`,
+            [GAME_PHASES.LEGISLATIVE]: `📜 ${t('phases.legislative')}`,
+            [GAME_PHASES.EXECUTIVE_POWER]: `⚡ ${t('phases.executivePower')}`,
+            [GAME_PHASES.DEBATE]: `💬 ${t('phases.debate')}`,
+            [GAME_PHASES.PAUSED]: `⏸️ ${t('phases.paused')}`
         };
 
         phaseElement.textContent = phaseNames[phase] || phase;
@@ -2157,8 +2160,8 @@ class CourtOfShadowsClient {
             }
 
             let badges = '';
-            if (player.id === state.currentKingId) badges += '<span class="player-badge">👑 Roi</span>';
-            if (player.id === state.currentChancellorId) badges += '<span class="player-badge">🎯 Chancelier</span>';
+            if (player.id === state.currentKingId) badges += `<span class="player-badge">👑 ${t('game.king')}</span>`;
+            if (player.id === state.currentChancellorId) badges += `<span class="player-badge">🎯 ${t('game.chancellor')}</span>`;
 
             // Afficher le vote si disponible (résultat final)
             let voteDisplay = '';
@@ -2174,9 +2177,9 @@ class CourtOfShadowsClient {
             else if (state.phase === GAME_PHASES.COUNCIL_VOTE && player.isAlive) {
                 const hasVoted = this.votedPlayerIds.includes(player.id);
                 if (hasVoted) {
-                    voteDisplay = `<span class="vote-status voted">✓ A voté</span>`;
+                    voteDisplay = `<span class="vote-status voted">✓ ${t('game.voted')}</span>`;
                 } else {
-                    voteDisplay = `<span class="vote-status thinking"><span class="loading-spinner"></span> Réfléchit...</span>`;
+                    voteDisplay = `<span class="vote-status thinking"><span class="loading-spinner"></span> ${t('game.thinking')}</span>`;
                 }
             }
 
@@ -2184,9 +2187,9 @@ class CourtOfShadowsClient {
             let roleIndicator = '';
             if (knownPlayer && knownPlayer.id !== this.playerId) {
                 const roleNames = {
-                    [ROLES.USURPER]: '👑💀 Usurpateur',
-                    [ROLES.CONSPIRATOR]: '🗡️ Conspirateur',
-                    [ROLES.LOYALIST]: '⚜️ Loyaliste'
+                    [ROLES.USURPER]: `👑💀 ${t('roles.usurper')}`,
+                    [ROLES.CONSPIRATOR]: `🗡️ ${t('roles.conspirator')}`,
+                    [ROLES.LOYALIST]: `⚜️ ${t('roles.loyalist')}`
                 };
                 roleIndicator = `<span class="known-role">${roleNames[knownPlayer.role] || ''}</span>`;
             }
@@ -2217,7 +2220,7 @@ class CourtOfShadowsClient {
                 if (state.currentKingId === this.playerId) {
                     this.showNominationUI(state);
                 } else {
-                    this.showWaitingUI(`En attente de la nomination du Roi...`);
+                    this.showWaitingUI(t('actions.waitingNomination'));
                 }
                 break;
 
@@ -2228,7 +2231,7 @@ class CourtOfShadowsClient {
             case GAME_PHASES.LEGISLATIVE:
                 // Ne pas écraser l'affichage si on est en train de choisir des cartes ou d'attendre la réponse au véto
                 if (!this.isSelectingDecrees && !this.isWaitingForVetoResponse) {
-                    this.showWaitingUI('Session législative en cours...');
+                    this.showWaitingUI(t('actions.legislativeInProgress'));
                 }
                 break;
 
@@ -2236,10 +2239,10 @@ class CourtOfShadowsClient {
                 if (state.currentKingId === this.playerId) {
                     // L'UI sera affichée par handlePowerActivated
                     if (!this.isUsingPower) {
-                        this.showWaitingUI('Préparez-vous à utiliser votre pouvoir...');
+                        this.showWaitingUI(t('actions.preparePower'));
                     }
                 } else {
-                    this.showWaitingUI('Le Roi utilise son pouvoir...');
+                    this.showWaitingUI(t('actions.kingUsingPower'));
                 }
                 break;
 
@@ -2263,23 +2266,23 @@ class CourtOfShadowsClient {
         const container = document.getElementById('action-container');
 
         const phaseNames = {
-            [GAME_PHASES.NOMINATION]: 'Nomination du Chancelier',
-            [GAME_PHASES.COUNCIL_VOTE]: 'Vote du Conseil',
-            [GAME_PHASES.LEGISLATIVE]: 'Session Législative',
-            [GAME_PHASES.EXECUTIVE_POWER]: 'Pouvoir Exécutif',
-            [GAME_PHASES.DEBATE]: 'Débat de la Cour'
+            [GAME_PHASES.NOMINATION]: t('phases.nomination'),
+            [GAME_PHASES.COUNCIL_VOTE]: t('phases.councilVote'),
+            [GAME_PHASES.LEGISLATIVE]: t('phases.legislative'),
+            [GAME_PHASES.EXECUTIVE_POWER]: t('phases.executivePower'),
+            [GAME_PHASES.DEBATE]: t('phases.debate')
         };
 
         container.innerHTML = `
             <div class="action-content" style="text-align: center; padding: 40px 20px;">
                 <div style="font-size: 4rem; margin-bottom: 20px;">💀</div>
-                <h2 style="color: #c44; margin-bottom: 15px;">Vous êtes Éliminé</h2>
+                <h2 style="color: #c44; margin-bottom: 15px;">${t('game.spectator')}</h2>
                 <p style="font-size: 1.1rem; color: #888; margin-bottom: 20px;">
-                    Vous observez la partie en tant que spectateur.
+                    ${t('game.spectatorDesc')}
                 </p>
                 <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px;">
                     <p style="color: var(--gold); font-size: 1rem;">
-                        Phase actuelle : <strong>${phaseNames[state.phase] || state.phase}</strong>
+                        ${t('game.currentPhase')} <strong>${phaseNames[state.phase] || state.phase}</strong>
                     </p>
                 </div>
             </div>
@@ -2298,10 +2301,10 @@ class CourtOfShadowsClient {
             // Pause automatique - joueur déconnecté
             pauseMessage = `
                 <p style="font-size: 1.2rem; color: #ccc;">
-                    En attente de reconnexion de : <strong>${disconnectedNames}</strong>
+                    ${t('pause.waitingReconnect', { players: disconnectedNames })}
                 </p>
                 <p style="font-size: 1rem; color: #888; margin-top: 20px;">
-                    La partie reprendra automatiquement quand le joueur se reconnectera.
+                    ${t('pause.willResumeAuto')}
                 </p>
             `;
 
@@ -2309,10 +2312,10 @@ class CourtOfShadowsClient {
                 hostButtons = `
                     <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2);">
                         <p style="font-size: 0.9rem; color: #888; margin-bottom: 15px;">
-                            En tant que créateur, vous pouvez forcer la reprise (les joueurs déconnectés seront éliminés).
+                            ${t('pause.hostCanForce')}
                         </p>
                         <button id="force-resume-btn" class="btn btn-danger">
-                            Forcer la reprise
+                            ${t('hostActions.forceResume')}
                         </button>
                     </div>
                 `;
@@ -2321,10 +2324,10 @@ class CourtOfShadowsClient {
             // Pause manuelle par le créateur
             pauseMessage = `
                 <p style="font-size: 1.2rem; color: #ccc;">
-                    Le créateur a mis la partie en pause.
+                    ${t('pause.pausedByHost')}
                 </p>
                 <p style="font-size: 1rem; color: #888; margin-top: 20px;">
-                    En attente de la reprise par le créateur.
+                    ${t('pause.waitingHost')}
                 </p>
             `;
 
@@ -2332,7 +2335,7 @@ class CourtOfShadowsClient {
                 hostButtons = `
                     <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2);">
                         <button id="force-resume-btn" class="btn btn-primary">
-                            ▶️ Reprendre la partie
+                            ▶️ ${t('hostActions.resume')}
                         </button>
                     </div>
                 `;
@@ -2342,7 +2345,7 @@ class CourtOfShadowsClient {
         container.innerHTML = `
             <div class="action-content" style="text-align: center; padding: 60px 20px;">
                 <div style="font-size: 5rem; margin-bottom: 30px;">⏸️</div>
-                <h2 style="color: var(--gold); margin-bottom: 20px;">Partie en Pause</h2>
+                <h2 style="color: var(--gold); margin-bottom: 20px;">${t('pause.title')}</h2>
                 ${pauseMessage}
                 ${hostButtons}
             </div>
@@ -2353,10 +2356,10 @@ class CourtOfShadowsClient {
                 if (hasDisconnectedPlayers) {
                     const confirmed = await showConfirmPopup({
                         icon: '⚠️',
-                        title: 'Forcer la reprise',
-                        message: 'Les joueurs déconnectés seront éliminés de la partie. Voulez-vous continuer ?',
-                        cancelText: 'Annuler',
-                        confirmText: 'Forcer la reprise',
+                        title: t('hostActions.forceResume'),
+                        message: t('hostActions.confirmForceResume'),
+                        cancelText: t('common.cancel'),
+                        confirmText: t('hostActions.forceResume'),
                         confirmClass: 'btn-danger'
                     });
 
@@ -2378,7 +2381,7 @@ class CourtOfShadowsClient {
     }
 
     handleGamePaused(data) {
-        this.showNotification(`⏸️ ${data.message}`);
+        this.showNotification(`⏸️ ${t('notifications.gamePaused')}`);
     }
 
     handleGameResumed(data) {
@@ -2387,10 +2390,10 @@ class CourtOfShadowsClient {
             this.showNotification(`▶️ ${data.message}`);
         } else if (data.playerName === 'Le créateur') {
             // Reprise par le créateur
-            this.showNotification(`▶️ La partie reprend !`);
+            this.showNotification(`▶️ ${t('notifications.gameResumed')}`);
         } else {
             // Reconnexion d'un joueur
-            this.showNotification(`▶️ ${data.playerName} s'est reconnecté ! La partie reprend.`);
+            this.showNotification(`▶️ ${t('notifications.playerReconnected', { player: data.playerName })}`);
         }
     }
 
@@ -2468,11 +2471,11 @@ class CourtOfShadowsClient {
         const container = document.getElementById('action-container');
 
         container.innerHTML = `
-            <h2 class="action-title">Nommez un Chancelier</h2>
+            <h2 class="action-title">${t('actions.nominateChancellor')}</h2>
             <div class="action-content">
-                <p>Vous êtes le Roi 👑. Choisissez un joueur pour devenir Chancelier.</p>
+                <p>${t('actions.selectChancellor')}</p>
                 <div class="player-selector" id="chancellor-selector"></div>
-                <button id="confirm-nomination" class="btn btn-primary" disabled>Confirmer la Nomination</button>
+                <button id="confirm-nomination" class="btn btn-primary" disabled>${t('actions.nominate')}</button>
             </div>
         `;
 
@@ -2536,7 +2539,7 @@ class CourtOfShadowsClient {
             roomId: this.roomId,
             chancellorId
         });
-        this.showWaitingUI('Nomination envoyée. En attente du vote...');
+        this.showWaitingUI(t('actions.waitingVote'));
     }
 
     handleNominationResult(data) {
@@ -2550,19 +2553,19 @@ class CourtOfShadowsClient {
         const chancellorName = this.allPlayers.find(p => p.id === this.gameState.nominatedChancellorId)?.name || 'Inconnu';
 
         container.innerHTML = `
-            <h2 class="action-title">Vote du Conseil</h2>
+            <h2 class="action-title">${t('actions.voteTitle')}</h2>
             <div class="action-content">
                 <p style="font-size: 1.3rem; text-align: center; margin: 20px 0;">
-                    Approuvez-vous <strong style="color: var(--gold);">${chancellorName}</strong> comme Chancelier ?
+                    ${t('actions.voteDesc')} <strong style="color: var(--gold);">${chancellorName}</strong>
                 </p>
                 <div class="vote-buttons">
                     <button class="vote-btn yes" id="vote-yes">
                         <div style="font-size: 3rem; margin-bottom: 10px;">✓</div>
-                        <div>OUI</div>
+                        <div>${t('actions.voteYes')}</div>
                     </button>
                     <button class="vote-btn no" id="vote-no">
                         <div style="font-size: 3rem; margin-bottom: 10px;">✗</div>
-                        <div>NON</div>
+                        <div>${t('actions.voteNo')}</div>
                     </button>
                 </div>
             </div>
@@ -2578,7 +2581,7 @@ class CourtOfShadowsClient {
             roomId: this.roomId,
             vote: voteChoice
         });
-        this.showWaitingUI('Vote envoyé. En attente des autres joueurs...');
+        this.showWaitingUI(t('actions.waitingVote'));
     }
 
     handleVoteStatus(data) {
@@ -2594,10 +2597,10 @@ class CourtOfShadowsClient {
         this.votedPlayerIds = [];
 
         if (data.voteResult.passed) {
-            this.showNotification(`✅ Vote accepté ! (${data.voteResult.yes} OUI, ${data.voteResult.no} NON)`);
+            this.showNotification(`✅ ${t('notifications.governmentElected')} (${data.voteResult.yes} ${t('actions.voteYes')}, ${data.voteResult.no} ${t('actions.voteNo')})`);
             soundManager.playVoteAccepted();
         } else {
-            this.showNotification(`❌ Vote rejeté ! (${data.voteResult.yes} OUI, ${data.voteResult.no} NON)`);
+            this.showNotification(`❌ ${t('notifications.governmentRejected')} (${data.voteResult.yes} ${t('actions.voteYes')}, ${data.voteResult.no} ${t('actions.voteNo')})`);
             soundManager.playVoteRejected();
         }
 
@@ -2622,7 +2625,7 @@ class CourtOfShadowsClient {
     // === AUTRES MÉTHODES ===
     handleDecreePassed(data) {
         const isPlot = data.decree === DECREE_TYPES.PLOT;
-        const decreeType = isPlot ? 'Complot' : 'Édit Royal';
+        const decreeType = isPlot ? t('decrees.plot') : t('decrees.royalEdict');
         const decreeIcon = isPlot ? '🗡️' : '⚜️';
 
         // Jouer le son approprié selon le type de décret
@@ -2633,12 +2636,13 @@ class CourtOfShadowsClient {
         }
 
         // Notification simple à droite
-        this.showNotification(`📜 ${decreeType} ${decreeIcon} adopté !`);
+        const notif = isPlot ? t('notifications.plotPassed') : t('notifications.editPassed');
+        this.showNotification(`📜 ${notif}`);
 
         // Ajouter le détail dans le chat
-        let actionMessage = `${decreeIcon} ${decreeType} adopté`;
+        let actionMessage = `${decreeIcon} ${decreeType}`;
         if (data.isDeadlock) {
-            actionMessage += ` (Impasse)`;
+            actionMessage += ` (${t('notifications.deadlockWarning')})`;
         } else if (data.kingName && data.chancellorName) {
             actionMessage += ` | 👑 ${data.kingName} → 📜 ${data.chancellorName}`;
         }
@@ -2674,22 +2678,22 @@ class CourtOfShadowsClient {
         if (isKing) {
             buttonHtml = `
                 <button id="next-turn-btn" class="btn btn-primary" style="margin-top: 30px;">
-                    Passer au Tour Suivant
+                    ${t('actions.endTurn')}
                 </button>
             `;
         } else {
             buttonHtml = `
                 <p style="text-align: center; font-style: italic; margin-top: 20px; color: #888;">
-                    En attente que le Roi passe au tour suivant...
+                    ${t('actions.debateInProgress')}
                 </p>
             `;
         }
 
         container.innerHTML = `
-            <h2 class="action-title">💬 Débat de la Cour</h2>
+            <h2 class="action-title">💬 ${t('phases.debate')}</h2>
             <div class="action-content">
                 <p style="text-align: center; font-size: 1.2rem;">
-                    Discutez avec les autres joueurs dans le chat.
+                    ${t('actions.discussAndEndTurn')}
                 </p>
                 ${buttonHtml}
             </div>
@@ -2872,9 +2876,9 @@ class CourtOfShadowsClient {
         soundManager.playExecution();
 
         if (wasUsurper) {
-            this.showNotification(`💀 ${executedName} a été exécuté... C'ÉTAIT L'USURPATEUR ! 👑💀`);
+            this.showNotification(`💀 ${t('notifications.playerExecuted', { player: executedName })} ${t('notifications.usurperExecuted')}`);
         } else {
-            this.showNotification(`💀 ${executedName} a été exécuté. Ce n'était PAS l'Usurpateur.`);
+            this.showNotification(`💀 ${t('notifications.playerExecuted', { player: executedName })}`);
         }
     }
 
