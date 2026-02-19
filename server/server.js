@@ -60,16 +60,27 @@ initDatabase().catch(err => {
     // process.exit(1);
 });
 
-// Servir les fichiers statiques
-app.use(express.static(path.join(__dirname, '../public')));
+// Servir les fichiers statiques (dist/ en production, public/ en dev fallback)
+const staticDir = process.env.NODE_ENV === 'production'
+  ? path.join(__dirname, '../dist')
+  : path.join(__dirname, '../dist');
 
-// Routes SPA - toutes les routes renvoient index.html
-app.get('/home', (req, res) => res.sendFile(path.join(__dirname, '../public/index.html')));
-app.get('/login', (req, res) => res.sendFile(path.join(__dirname, '../public/index.html')));
-app.get('/register', (req, res) => res.sendFile(path.join(__dirname, '../public/index.html')));
-app.get('/rules', (req, res) => res.sendFile(path.join(__dirname, '../public/index.html')));
-app.get('/room/:code', (req, res) => res.sendFile(path.join(__dirname, '../public/index.html')));
-app.get('/game/:code', (req, res) => res.sendFile(path.join(__dirname, '../public/index.html')));
+app.use(express.static(staticDir));
+
+// Route SPA universelle — renvoie index.html pour toutes les routes non-API/non-WS
+app.get('*', (req, res, next) => {
+  // Ne pas intercepter les upgrades WebSocket
+  if (req.headers.upgrade && req.headers.upgrade.toLowerCase() === 'websocket') {
+    return next();
+  }
+  const indexPath = path.join(staticDir, 'index.html');
+  res.sendFile(indexPath, (err) => {
+    if (err) {
+      // En développement, dist/ n'existe peut-être pas encore → fallback public/
+      res.sendFile(path.join(__dirname, '../public/index.html'));
+    }
+  });
+});
 
 // Gestionnaire de parties
 const gameManager = new GameManager();
