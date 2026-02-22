@@ -8,6 +8,9 @@ i18n
   .use(LanguageDetector)     // Lit localStorage 'lang' puis navigator.language
   .use(initReactI18next)
   .init({
+    react: {
+      useSuspense: true,
+    },
     fallbackLng: 'fr',
     supportedLngs: ['fr', 'en', 'es'],
     ns: ['translation'],
