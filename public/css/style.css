@@ -302,10 +302,12 @@ body {
 
 .waiting-layout {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
     min-height: 100vh;
-    padding: 20px;
+    padding: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
 }
 
 .waiting-content {
@@ -313,11 +315,6 @@ body {
     max-width: 1200px;
 }
 
-.waiting-content .title {
-    text-align: left;
-    margin-bottom: 20px;
-    font-size: 2.5rem;
-}
 
 .waiting-grid {
     display: grid;
@@ -325,6 +322,88 @@ body {
     gap: 20px;
     margin-bottom: 20px;
 }
+
+/* === Classes utilisées par les composants React === */
+
+.waiting-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.waiting-header h2 {
+    font-size: 2rem;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.room-code-display {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 8px 16px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 2px;
+}
+
+.waiting-content {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.waiting-players {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    border: 1px solid var(--border);
+}
+
+.waiting-players h3 {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    color: var(--text-primary);
+}
+
+.players-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+.waiting-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.waiting-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.activity-log {
+    flex: 1;
+    max-height: 250px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 4px;
+}
+
+/* === Anciennes classes (compatibilité) === */
 
 .waiting-left {
     display: flex;
@@ -2373,17 +2452,34 @@ input[type="password"]::placeholder {
 
     /* Waiting layout mobile */
     .waiting-layout {
-        display: block;
-    }
-
-    .waiting-content {
-        max-width: 100%;
         padding: 15px;
     }
 
-    .waiting-content .title {
-        text-align: center;
+    .waiting-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .waiting-header h2 {
         font-size: 1.6rem;
+    }
+
+    .waiting-content {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .waiting-sidebar {
+        order: -1;
+    }
+
+    .waiting-actions {
+        flex-direction: column;
+    }
+
+    .activity-log {
+        max-height: 150px;
     }
 
     .waiting-grid {
