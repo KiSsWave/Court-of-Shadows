@@ -669,7 +669,36 @@ body {
 }
 
 .setting-item {
-    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    padding: 10px 14px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.setting-item:hover {
+    background: var(--surface-hover);
+    border-color: var(--primary);
+}
+
+.setting-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    accent-color: var(--primary);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.setting-item span {
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    line-height: 1.4;
 }
 
 .toggle-label {
