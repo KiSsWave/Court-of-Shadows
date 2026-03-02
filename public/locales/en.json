@@ -51,7 +51,10 @@
     "enterRoomCode": "Please enter the room code",
     "players": "players",
     "ago": "ago",
-    "justNow": "Just now"
+    "justNow": "Just now",
+    "joinGame": "Join with Code",
+    "joinPassword": "Password (if private game...)",
+    "rules": "View Game Rules"
   },
   "waiting": {
     "title": "Waiting Room",
@@ -67,7 +70,10 @@
     "youJoined": "You joined the game",
     "youAreHost": "You are now the game master",
     "kick": "Kick",
-    "ban": "Ban"
+    "ban": "Ban",
+    "players": "Connected Players",
+    "settings": "Game Settings",
+    "leaveGame": "Leave Game"
   },
   "settings": {
     "title": "Game Settings",
@@ -78,7 +84,9 @@
     "limitedKnowledge": "Limited Conspirator Knowledge",
     "limitedKnowledgeHint": "9-10 players only: each conspirator knows only one ally (circular chain)",
     "previousKingRestriction": "Previous King cannot be Chancellor",
-    "previousKingRestrictionHint": "If enabled, the previous king will also be ineligible for chancellor"
+    "previousKingRestrictionHint": "If enabled, the previous king will also be ineligible for chancellor",
+    "previousKingCannotBeChancellor": "Previous King cannot be Chancellor",
+    "limitedConspiratorsKnowledge": "Limited Conspirators Knowledge"
   },
   "roles": {
     "usurper": "Usurper",

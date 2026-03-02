@@ -51,7 +51,10 @@
     "enterRoomCode": "Por favor, ingrese el código de la sala",
     "players": "jugadores",
     "ago": "Hace",
-    "justNow": "Ahora mismo"
+    "justNow": "Ahora mismo",
+    "joinGame": "Unirse con Código",
+    "joinPassword": "Contraseña (si partida privada...)",
+    "rules": "Ver Reglas del Juego"
   },
   "waiting": {
     "title": "Sala de espera",
@@ -67,7 +70,10 @@
     "youJoined": "Te uniste a la partida",
     "youAreHost": "Ahora eres el anfitrión de la partida",
     "kick": "Expulsar",
-    "ban": "Banear"
+    "ban": "Banear",
+    "players": "Jugadores conectados",
+    "settings": "Configuración de la partida",
+    "leaveGame": "Abandonar partida"
   },
   "settings": {
     "title": "Configuración de la partida",
@@ -78,7 +84,9 @@
     "limitedKnowledge": "Conocimiento limitado de Conspiradores",
     "limitedKnowledgeHint": "Solo 9-10 jugadores: cada conspirador conoce solo a un aliado (cadena circular)",
     "previousKingRestriction": "El Rey anterior no puede ser Canciller",
-    "previousKingRestrictionHint": "Si está activado, el rey anterior también será inelegible para canciller"
+    "previousKingRestrictionHint": "Si está activado, el rey anterior también será inelegible para canciller",
+    "previousKingCannotBeChancellor": "El Rey anterior no puede ser Canciller",
+    "limitedConspiratorsKnowledge": "Conocimiento limitado de Conspiradores"
   },
   "roles": {
     "usurper": "Usurpador",

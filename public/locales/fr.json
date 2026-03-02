@@ -51,7 +51,10 @@
     "enterRoomCode": "Veuillez entrer le code de la partie",
     "players": "joueurs",
     "ago": "Il y a",
-    "justNow": "À l'instant"
+    "justNow": "À l'instant",
+    "joinGame": "Rejoindre avec Code",
+    "joinPassword": "Mot de passe (si partie privée...)",
+    "rules": "Consulter les Règles du Jeu"
   },
   "waiting": {
     "title": "Salle d'attente",
@@ -67,7 +70,10 @@
     "youJoined": "Vous avez rejoint la partie",
     "youAreHost": "Vous êtes maintenant le maître de la partie",
     "kick": "Kick",
-    "ban": "Ban"
+    "ban": "Ban",
+    "players": "Joueurs connectés",
+    "settings": "Paramètres de la partie",
+    "leaveGame": "Quitter la partie"
   },
   "settings": {
     "title": "Paramètres de la partie",
@@ -78,7 +84,9 @@
     "limitedKnowledge": "Connaissance limitée des Conspirateurs",
     "limitedKnowledgeHint": "9-10 joueurs uniquement : chaque conspirateur ne connaît qu'un seul allié (chaîne circulaire)",
     "previousKingRestriction": "Le Roi précédent ne peut être élu Chancelier",
-    "previousKingRestrictionHint": "Si activé, le roi du tour précédent sera inéligible au poste de chancelier"
+    "previousKingRestrictionHint": "Si activé, le roi du tour précédent sera inéligible au poste de chancelier",
+    "previousKingCannotBeChancellor": "Le Roi précédent ne peut être élu Chancelier",
+    "limitedConspiratorsKnowledge": "Connaissance limitée des Conspirateurs"
   },
   "roles": {
     "usurper": "Usurpateur",
