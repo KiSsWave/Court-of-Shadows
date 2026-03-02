@@ -1,32 +1,31 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import HttpBackend from 'i18next-http-backend';
+
+import fr from '../public/locales/fr.json';
+import en from '../public/locales/en.json';
+import es from '../public/locales/es.json';
 
 export const i18nReady = i18n
-  .use(HttpBackend)          // Charge /locales/{{lng}}.json au runtime
-  .use(LanguageDetector)     // Lit localStorage 'lang' puis navigator.language
+  .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    react: {
-      useSuspense: true,
+    resources: {
+      fr: { translation: fr },
+      en: { translation: en },
+      es: { translation: es },
     },
     fallbackLng: 'fr',
     supportedLngs: ['fr', 'en', 'es'],
     ns: ['translation'],
     defaultNS: 'translation',
-    backend: {
-      // public/locales/ est copié verbatim dans dist/locales/ par Vite publicDir
-      loadPath: '/locales/{{lng}}.json',
-    },
     detection: {
       order: ['localStorage', 'navigator'],
       lookupLocalStorage: 'lang',
       caches: ['localStorage'],
     },
     interpolation: {
-      escapeValue: false, // React échappe déjà
-      // Les fichiers locales utilisent {param} (une seule accolade)
+      escapeValue: false,
       prefix: '{',
       suffix: '}',
     },
