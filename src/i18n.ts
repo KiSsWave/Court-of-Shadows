@@ -3,7 +3,7 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import HttpBackend from 'i18next-http-backend';
 
-i18n
+export const i18nReady = i18n
   .use(HttpBackend)          // Charge /locales/{{lng}}.json au runtime
   .use(LanguageDetector)     // Lit localStorage 'lang' puis navigator.language
   .use(initReactI18next)
